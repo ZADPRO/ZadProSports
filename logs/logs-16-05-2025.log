@@ -1,0 +1,50 @@
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:01:21.003Z"}
+{"level":"info","message":"GET URL REQ => http://localhost:6200/api/v1/groundRoutes/uploadRoomImage","timestamp":"2025-05-16T10:01:28.318Z"}
+{"level":"error","message":"Error in upload Room Image Cannot read properties of undefined (reading 'id')","stack":"TypeError: Cannot read properties of undefined (reading 'id')\n    at groundRepository.<anonymous> (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\groundRepository.ts:126:35)\n    at Generator.next (<anonymous>)\n    at C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\groundRepository.ts:8:71\n    at new Promise (<anonymous>)\n    at __awaiter (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\groundRepository.ts:4:12)\n    at groundRepository.uploadRoomImageV1 (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\groundRepository.ts:108:16)\n    at groundResolver.<anonymous> (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\resolver.ts:12:40)\n    at Generator.next (<anonymous>)\n    at C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\resolver.ts:8:71\n    at new Promise (<anonymous>)","timestamp":"2025-05-16T10:01:28.334Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:02:26.490Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:02:35.246Z"}
+{"level":"info","message":"GET URL REQ => http://localhost:6200/api/v1/groundRoutes/uploadRoomImage","timestamp":"2025-05-16T10:02:40.958Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:03:06.231Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:03:54.803Z"}
+{"level":"error","message":"Server not running ---  New route /api/v1/groundRoutes/uploadRoomImage conflicts with existing /api/v1/groundRoutes/uploadRoomImage","name":"AssertError","stack":"AssertError: New route /api/v1/groundRoutes/uploadRoomImage conflicts with existing /api/v1/groundRoutes/uploadRoomImage\n    at module.exports.internals.Segment.internals.Segment.add (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\call\\lib\\segment.js:47:14)\n    at exports.Router.internals.Router.internals.Router.add (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\call\\lib\\index.js:65:16)\n    at internals.Server._addRoute (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\hapi\\lib\\server.js:529:46)\n    at internals.Server.route (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\hapi\\lib\\server.js:518:22)\n    at C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:13:14\n    at new Promise (<anonymous>)\n    at groundRoutes.<anonymous> (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:11:12)\n    at Generator.next (<anonymous>)\n    at C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:8:71\n    at new Promise (<anonymous>)","timestamp":"2025-05-16T10:04:01.751Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:04:11.240Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:04:49.887Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:04:57.270Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:05:26.469Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:07:10.578Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:07:35.161Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:07:43.620Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:07:49.672Z"}
+{"level":"info","message":"GET URL REQ => http://localhost:6200/api/v1/groundRoutes/uploadGroundImage","timestamp":"2025-05-16T10:09:06.963Z"}
+{"level":"info","message":"GET URL REQ => http://localhost:6200/api/v1/settingRoutes/uploadFoodImage","timestamp":"2025-05-16T10:10:12.144Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:10:35.072Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:10:45.864Z"}
+{"level":"error","message":"Server not running ---  New route /api/v1/groundRoutes/addGround conflicts with existing /api/v1/groundRoutes/addGround","name":"AssertError","stack":"AssertError: New route /api/v1/groundRoutes/addGround conflicts with existing /api/v1/groundRoutes/addGround\n    at module.exports.internals.Segment.internals.Segment.add (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\call\\lib\\segment.js:47:14)\n    at exports.Router.internals.Router.internals.Router.add (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\call\\lib\\index.js:65:16)\n    at internals.Server._addRoute (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\hapi\\lib\\server.js:529:46)\n    at internals.Server.route (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\hapi\\lib\\server.js:518:22)\n    at C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:13:14\n    at new Promise (<anonymous>)\n    at groundRoutes.<anonymous> (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:11:12)\n    at Generator.next (<anonymous>)\n    at C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:8:71\n    at new Promise (<anonymous>)","timestamp":"2025-05-16T10:10:52.054Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:11:03.597Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:26:22.877Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:26:34.654Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:31:40.370Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:31:50.397Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:32:06.956Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:33:14.795Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:33:25.430Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:34:55.254Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:36:28.681Z"}
+{"level":"info","message":"GET URL REQ => http://localhost:6200/api/v1/settingRoutes/uploadFoodImage","timestamp":"2025-05-16T10:44:24.221Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:53:47.599Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T10:59:58.652Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:02:58.530Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:07:29.605Z"}
+{"level":"info","message":"GET URL REQ => http://localhost:6200/api/v1/groundRoutes/addGround","timestamp":"2025-05-16T11:08:08.872Z"}
+{"level":"error","message":"Server not running ---  New route /api/v1/groundRoutes/addGround conflicts with existing /api/v1/groundRoutes/addGround","name":"AssertError","stack":"AssertError: New route /api/v1/groundRoutes/addGround conflicts with existing /api/v1/groundRoutes/addGround\n    at module.exports.internals.Segment.internals.Segment.add (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\call\\lib\\segment.js:47:14)\n    at exports.Router.internals.Router.internals.Router.add (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\call\\lib\\index.js:65:16)\n    at internals.Server._addRoute (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\hapi\\lib\\server.js:529:46)\n    at internals.Server.route (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\node_modules\\@hapi\\hapi\\lib\\server.js:518:22)\n    at C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:13:14\n    at new Promise (<anonymous>)\n    at groundRoutes.<anonymous> (C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:11:12)\n    at Generator.next (<anonymous>)\n    at C:\\Users\\INDHU\\Desktop\\projects\\sports app\\src\\api\\ground\\routes.ts:8:71\n    at new Promise (<anonymous>)","timestamp":"2025-05-16T11:10:33.526Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:12:12.980Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:12:24.690Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:12:47.662Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:13:11.938Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:13:31.513Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:32:29.266Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:32:49.035Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:33:00.763Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:33:25.702Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T11:33:40.263Z"}
+{"level":"info","message":"Server running --- from server.ts","timestamp":"2025-05-16T12:52:58.371Z"}
