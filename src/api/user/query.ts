@@ -17,12 +17,9 @@ export const adduserBookingQuery = `
 INSERT INTO
   public."refUserBooking" (
     "refUserId",
-    "refGroundId",
-    "isFoodNeeded",
-    "refComboId",
-    "refComboCount",
+    "refGroundId",  
     "refBookingTypeId",
-    "isRoomNeeded",
+    "refAddOnsId",
     "refBookingStartDate",
     "refBookingEndDate",
     "refStartTime",
@@ -43,14 +40,17 @@ VALUES
     $8,
     $9,
     $10,
-    $11,
-    $12,
-    $13,
-    $14
+    $11
   )
 RETURNING
   *;
 `;
+
+export const insertUnavailableQuery = `
+            INSERT INTO "addOnUnAvailability"
+              ("unAvailabilityDate", "refAddOnsId", "createdAt", "createdBy", "refGroundId")
+            VALUES ($1, $2, $3, $4, $5)
+          `;
 
 export const listFiletedGroundsQuery = `
 SELECT
@@ -151,7 +151,6 @@ GROUP BY
 LIMIT
   5;
 `;
-
 
 export const listFreeGroundsQuery = `
 SELECT
@@ -283,15 +282,53 @@ RETURNING
   *;
 `;
 
-export const listUserBookingHistoryQuery =
-`
+export const listUserBookingHistoryQuery = `
 SELECT
-  *
+  ub.*,
+  rg."refGroundName",
+  rg."refGroundCustId",
+  rg."isAddOnAvailable",
+  rg."refGroundPrice",
+  rg."refGroundLocation",
+  rg."refGroundPincode",
+  rg."refGroundState",
+  (
+    SELECT json_agg(DISTINCT jsonb_build_object(
+      'addOnId', ao."refAddOnsId",
+      'addon', ao."refAddOn",
+      'selectedDates', (
+        SELECT array_agg(aa."unAvailabilityDate")
+        FROM public."addOnUnAvailability" aa
+        WHERE aa."refAddOnsId" = ao."refAddOnsId"
+          AND aa."refGroundId" = ub."refGroundId"
+          AND aa."isDelete" IS NOT true
+      )
+    ))
+    FROM public."refAddOns" ao
+    WHERE ao."refAddOnsId" = ANY (
+      string_to_array(
+        regexp_replace(ub."refAddOnsId", '[{}]', '', 'g'),
+        ','
+      )::INTEGER[]
+    )
+    AND ao."refStatus" IS true
+  ) AS "AddOn"
 FROM
-  public."refUserBooking"
+  public."refUserBooking" ub
+  LEFT JOIN public."refGround" rg ON CAST(rg."refGroundId" AS INTEGER) = ub."refGroundId"
 WHERE
-  "refUserId" = $1
-  AND "isDelete" IS NOT true
+  ub."refUserId" = $1
+  AND ub."isDelete" IS NOT true
+GROUP BY
+  ub."refUserBookingId",
+  rg."refGroundName",
+  rg."refGroundCustId",
+  rg."isAddOnAvailable",
+  rg."refGroundPrice",
+  rg."refGroundLocation",
+  rg."refGroundPincode",
+  rg."refGroundState"
+
 `;
 
 export const listUserAuditPageQuery = `
@@ -322,12 +359,127 @@ WHERE
   AND u."isDelete" IS NOT true
 `;
 
-// export const checkQuery = `
-// SELECT
-//   COUNT(*)
-// FROM
-//   public."refUsersDomain"
-// WHERE
-//   "refUserName" = $1
-//   OR "refEmail" = $2;
-// `;
+export const getGroundsQuery = `
+SELECT
+  rg.*,
+  array_agg(DISTINCT f."refFeaturesName") AS "refFeaturesName",
+  array_agg(DISTINCT fe."refFacilitiesName") AS "refFacilitiesName",
+  array_agg(DISTINCT ug."refUserGuidelinesName") AS "refUserGuidelinesName",
+  array_agg(DISTINCT ad."refAdditionalTipsName") AS "refAdditionalTipsName",
+  array_agg(DISTINCT s."refSportsCategoryName") AS "refSportsCategoryName"
+FROM
+  public."refGround" rg
+  LEFT JOIN public."refFeatures" f ON CAST(f."refFeaturesId" AS INTEGER) = ANY (
+    string_to_array(
+      regexp_replace(rg."refFeaturesId", '[{}]', '', 'g'),
+      ','
+    )::INTEGER[]
+  )
+  LEFT JOIN public."refFacilities" fe ON CAST(fe."refFacilitiesId" AS INTEGER) = ANY (
+    string_to_array(
+      regexp_replace(rg."refFacilitiesId", '[{}]', '', 'g'),
+      ','
+    )::INTEGER[]
+  )
+  LEFT JOIN public."refUserGuidelines" ug ON CAST(ug."refUserGuidelinesId" AS INTEGER) = ANY (
+    string_to_array(
+      regexp_replace(rg."refUserGuidelinesId", '[{}]', '', 'g'),
+      ','
+    )::INTEGER[]
+  )
+  LEFT JOIN public."refAdditionalTips" ad ON CAST(ad."refAdditionalTipsId" AS INTEGER) = ANY (
+    string_to_array(
+      regexp_replace(rg."refAdditionalTipsId", '[{}]', '', 'g'),
+      ','
+    )::INTEGER[]
+  )
+  LEFT JOIN public."refSportsCategory" s ON CAST(s."refSportsCategoryId" AS INTEGER) = ANY (
+    string_to_array(
+      regexp_replace(rg."refSportsCategoryId", '[{}]', '', 'g'),
+      ','
+    )::INTEGER[]
+  )
+WHERE
+  rg."isDelete" IS NOT true
+  AND rg."refGroundId" = $1
+GROUP BY
+  rg."refGroundId";
+`;
+
+export const getGroundUnavailableDateQuery = `
+SELECT
+  ao."refAddOn",
+  aa."addOnsAvailabilityId",
+  aa."unAvailabilityDate"
+FROM
+  public."addOnUnAvailability" aa
+  LEFT JOIN public."refAddOns" ao ON CAST(ao."refAddOnsId" AS INTEGER) = aa."refAddOnsId"
+WHERE
+  ao."refAddOn" = 'Ground'
+  AND ao."refStatus" IS true
+  AND ao."isDelete" IS NOT true
+  AND aa."refGroundId" = $1
+`;
+
+export const listUnavailableAddonsQuery = `
+SELECT
+  ao."refAddOnsId",
+  ao."refAddOn",
+  aa."addOnsAvailabilityId",
+  aa."unAvailabilityDate",
+  array_agg(
+    json_build_object(
+      'refAddOnsId',
+      ao."refAddOnsId",
+      'refAddOn',
+      ao."refAddOn",
+      'unAvailabilityDate',
+      aa."unAvailabilityDate"
+    )
+  ) AS arrayDate
+FROM
+  public."addOnUnAvailability" aa
+  LEFT JOIN public."refAddOns" ao ON CAST(ao."refAddOnsId" AS INTEGER) = aa."refAddOnsId"
+WHERE
+  ao."refStatus" IS true
+  AND ao."isDelete" IS NOT true
+GROUP BY
+  ao."refAddOnsId",
+  ao."refAddOn",
+  aa."addOnsAvailabilityId",
+  aa."unAvailabilityDate"
+`;
+
+export const addUnavailbleDatesQuery = `
+INSERT INTO
+  public."addOnUnAvailability" (
+    "unAvailabilityDate",
+    "refGroundId",
+    "createdAt",
+    "createdBy"
+  )
+VALUES
+  ($1, $2, $3, $4)
+`;
+
+export const listaddonsQuery = `
+SELECT
+  *
+FROM
+  public."refAddOns"
+WHERE
+  "refStatus" IS true
+  AND "isDelete" IS NOT true
+  AND "refAddOn" != 'Ground'
+`;
+
+export const getGroundPriceQuery = `
+SELECT
+  "refGroundPrice"
+FROM
+  public."refGround"
+WHERE
+  "refGroundId" = $1
+`;
+
+

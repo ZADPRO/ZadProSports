@@ -33,6 +33,7 @@ import {
   updateAddOnsAvailabilityQuery,
   deleteAddonsAvailabilityQuery,
   listAddonesAvailabilityQuery,
+  getAvailableAddonsQuery,
 } from "./query";
 import { CurrentTime } from "../../helper/common";
 
@@ -48,7 +49,9 @@ export class groundRepository {
       const {
         refGroundName,
         isAddOnAvailable,
-        // refAddOnsId,
+        // refAddon,
+        // refAddonStatus,
+        IframeLink,
         refGroundPrice,
         refGroundImage,
         refGroundLocation,
@@ -58,7 +61,8 @@ export class groundRepository {
         refStatus,
       } = userData;
 
-      const refAddOnsId = isAddOnAvailable ? userData.refAddOnsId : null;
+      const refAddon = isAddOnAvailable ? userData.refAddon : null;
+      const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
 
       const refFeaturesId = `{${userData.refFeaturesId.join(",")}}`;
       const refUserGuidelinesId = `{${userData.refUserGuidelinesId.join(",")}}`;
@@ -87,7 +91,7 @@ export class groundRepository {
         refGroundName,
         newCustomerId,
         isAddOnAvailable,
-        refAddOnsId,
+        // refAddOnsId,
         refFeaturesId,
         refUserGuidelinesId,
         refAdditionalTipsId,
@@ -100,13 +104,20 @@ export class groundRepository {
         refGroundState,
         refDescription,
         refStatus,
+        IframeLink,
         CurrentTime(),
         tokendata.id,
       ];
       console.log("params", params);
       const Result = await client.query(addGroundQuery, params);
       //   console.log("userResult", userResult);
+      const getgroundId = Result.rows[0];
 
+      const result = await client.query(addAddOnsQuery, [
+        refAddon,
+        getgroundId.refGroundId,
+        refAddonStatus,
+      ]);
       const history = [
         24,
         tokendata.id,
@@ -155,7 +166,10 @@ export class groundRepository {
         refGroundId,
         refGroundName,
         isAddOnAvailable,
-        // refRoomImage,
+        refAddOnsId,
+        // refAddon,
+        // refAddonStatus,
+        IframeLink,
         refGroundPrice,
         refGroundImage,
         refGroundLocation,
@@ -165,7 +179,8 @@ export class groundRepository {
         refStatus,
       } = userData;
 
-      const refAddOnsId = isAddOnAvailable ? userData.refAddOnsId : null;
+      const refAddon = isAddOnAvailable ? userData.refAddon : null;
+      const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
 
       const refFeaturesId = `{${userData.refFeaturesId.join(",")}}`;
       const refUserGuidelinesId = `{${userData.refUserGuidelinesId.join(",")}}`;
@@ -177,7 +192,6 @@ export class groundRepository {
         refGroundId,
         refGroundName,
         isAddOnAvailable,
-        refAddOnsId,
         refFeaturesId,
         refUserGuidelinesId,
         refAdditionalTipsId,
@@ -190,12 +204,22 @@ export class groundRepository {
         refGroundState,
         refDescription,
         refStatus,
+        IframeLink,
         CurrentTime(),
         tokendata.id,
       ];
       console.log("params", params);
       const Result = await client.query(updateGroundQuery, params);
       //   console.log("userResult", userResult);
+
+      const result = await client.query(updateAddOnsQuery, [
+        refAddOnsId,
+        refAddon,
+        refGroundId,
+        refAddonStatus,
+        CurrentTime(),
+        tokendata.id,
+      ]);
 
       const history = [
         25,
@@ -214,6 +238,7 @@ export class groundRepository {
           message: "Ground updated successfully",
           Result: Result,
           token: tokens,
+          addon: result,
         },
         true
       );
@@ -477,25 +502,24 @@ export class groundRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-
-      
       const result = await executeQuery(listGroundQuery);
 
-      //       for (const product of result) {
-      //   if (product.foodPic) {
+
+      // for (const product of result) {
+      //   if (product.refGroundImage) {
       //     try {
-      //       const fileBuffer = await fs.promises.readFile(product.foodPic);
-      //       product.foodPic = {
-      //         filename: path.basename(product.foodPic),
+      //       const fileBuffer = await viewFile(product.refGroundImage);
+      //       product.refGroundImage = {
+      //         filename: path.basename(product.refGroundImage),
       //         content: fileBuffer.toString("base64"),
       //         contentType: "image/jpeg", // Change based on actual file type if necessary
       //       };
       //     } catch (err) {
       //       console.error(
-      //         Error reading image file for product ${product.productId}:,
+      //         "Error reading image file for product ${product.productId}:",
       //         err
       //       );
-      //       product.foodPic = null; // Handle missing or unreadable files gracefully
+      //       product.refGroundImage = null; // Handle missing or unreadable files gracefully
       //     }
       //   }
       // }
@@ -596,7 +620,29 @@ export class groundRepository {
       await client.query("BEGIN"); // Start transaction
 
       const { refGroundId } = userData;
-      const result = await client.query(getGroundQuery, [refGroundId]);
+      const result: any = await client.query(getGroundQuery, [refGroundId]);
+
+      const getAddons = await executeQuery(getAvailableAddonsQuery, [refGroundId]);
+
+      // for (const product of result) {
+      //   if (product.refGroundImage) {
+      //     try {
+      //       const fileBuffer = await viewFile(product.refGroundImage);
+      //       product.refGroundImage = {
+      //         filename: path.basename(product.refGroundImage),
+      //         content: fileBuffer.toString("base64"),
+      //         contentType: "image/jpeg", // Change based on actual file type if necessary
+      //       };
+      //     } catch (err) {
+      //       console.error(
+      //         "Error reading image file for product ${product.productId}:",
+      //         err
+      //       );
+      //       product.refGroundImage = null; // Handle missing or unreadable files gracefully
+      //     }
+      //   }
+      // }
+
 
       await client.query("COMMIT"); // Commit transaction
 
@@ -605,7 +651,8 @@ export class groundRepository {
           success: true,
           message: "ground get successfully",
           token: tokens,
-          result: result.rows[0], // Return deleted record for reference
+          result: result.rows[0], 
+          getAddons:getAddons// Return deleted record for reference
         },
         true
       );
@@ -635,8 +682,12 @@ export class groundRepository {
     try {
       await client.query("BEGIN"); // Start transaction
 
-      const { addOns, refGroundId } = userData;
-      const result = await client.query(addAddOnsQuery, [addOns, refGroundId]);
+      const { addOns, refGroundId, refStatus } = userData;
+      const result = await client.query(addAddOnsQuery, [
+        addOns,
+        refGroundId,
+        refStatus,
+      ]);
 
       const history = [
         33,
@@ -682,11 +733,12 @@ export class groundRepository {
     try {
       await client.query("BEGIN"); // Start transaction
 
-      const { refAddOnsId, addOns, refGroundId } = userData;
+      const { refAddOnsId, addOns, refGroundId, refStatus } = userData;
       const result = await client.query(updateAddOnsQuery, [
         refAddOnsId,
         addOns,
         refGroundId,
+        refStatus,
         CurrentTime(),
         tokendata.id,
       ]);
@@ -833,10 +885,11 @@ export class groundRepository {
     try {
       await client.query("BEGIN"); // Start transaction
 
-      const { unAvailabilityDate, refAddOnsId } = userData;
+      const { unAvailabilityDate, refAddOnsId, refGroundId } = userData;
       const result = await client.query(addAddOnsAvailabilityQuery, [
         unAvailabilityDate,
         refAddOnsId,
+        refGroundId,
         CurrentTime(),
         tokendata.id,
       ]);
@@ -888,13 +941,18 @@ export class groundRepository {
     try {
       await client.query("BEGIN"); // Start transaction
 
-      const { addOnsAvailabilityId, unAvailabilityDate, refAddOnsId } =
-        userData;
+      const {
+        addOnsAvailabilityId,
+        unAvailabilityDate,
+        refAddOnsId,
+        refGroundId,
+      } = userData;
 
       const result = await client.query(updateAddOnsAvailabilityQuery, [
         addOnsAvailabilityId,
         unAvailabilityDate,
         refAddOnsId,
+        refGroundId,
         CurrentTime(),
         tokendata.id,
       ]);
@@ -1010,7 +1068,10 @@ export class groundRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listAddonesAvailabilityQuery);
+      // const result = await executeQuery(listAddonesAvailabilityQuery);
+      const result = await executeQuery(listAddonesAvailabilityQuery); // returns array of rows
+
+      console.log('result', result)
 
       return encrypt(
         {

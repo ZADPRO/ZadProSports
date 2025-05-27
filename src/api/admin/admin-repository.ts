@@ -143,6 +143,8 @@ export class adminRepository {
             success: true,
             message: "User signed up added successful",
             user: newUser,
+            firstName:refFName,
+            lastName:refLName
           },
           true
         );

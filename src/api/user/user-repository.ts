@@ -16,12 +16,19 @@ import { generatePassword } from "../../helper/common";
 
 import { CurrentTime } from "../../helper/common";
 import {
+  addUnavailbleDatesQuery,
   adduserBookingQuery,
+  getGroundPriceQuery,
+  getGroundsQuery,
+  getGroundUnavailableDateQuery,
   getUsersQuery,
+  insertUnavailableQuery,
+  listaddonsQuery,
   listFiletedGroundsQuery,
   listFreeGroundsQuery,
   listGroundsQuery,
   listProfleDataQuery,
+  listUnavailableAddonsQuery,
   listUserAuditPageQuery,
   listUserBookingHistoryQuery,
   selectUserByLogin,
@@ -34,94 +41,6 @@ import { generateforgotPasswordEmailContent } from "../../helper/mailcontent";
 import { sendEmail } from "../../helper/mail";
 
 export class userRepository {
-  //   public async userGroundBookingV1(
-  //     userData: any,
-  //     tokendata: any
-  //   ): Promise<any> {
-  //     console.log("userData", userData);
-  //     const client: PoolClient = await getClient();
-  //     const token = { id: tokendata.id };
-  //     const tokens = generateTokenWithExpire(token, true);
-  //     try {
-  //       await client.query("BEGIN");
-
-  //       const {
-  //         refGroundId,
-  //         isFoodNeeded,
-  //         refComboId,
-  //         refComboCount,
-  //         refBookingTypeId,
-  //         isRoomNeeded,
-  //         refBookingStartDate,
-  //         refBookingEndDate,
-  //         refStartTime,
-  //         refEndTime,
-  //         additionalNotes,
-  //       } = userData;
-
-  //       const food = isFoodNeeded === true;
-  //       const combo = isFoodNeeded ? refComboId && refComboCount: null;
-  //       if (refBookingTypeId === 1 ){
-  //         const endDate = refBookingTypeId ? refBookingEndDate: null;
-  //       }
-
-  //       const params = [
-  //         tokendata.id,
-  //         refGroundId,
-  //         food,
-  //         combo,
-  //         refComboCount,
-  //         refBookingTypeId,
-  //         isRoomNeeded,
-  //         refBookingStartDate,
-  //         endDate,
-  //         refStartTime,
-  //         refEndTime,
-  //         additionalNotes,
-  //         CurrentTime(),
-  //         tokendata.id,
-  //       ];
-  //       console.log("params", params);
-  //       const Result = await client.query(adduserBookingQuery, params);
-  //       //   console.log("userResult", userResult);
-
-  //       //   const history = [
-  //       //     24,
-  //       //     tokendata.id,
-  //       //     `Ground Booked Successfully`,
-  //       //     CurrentTime(),
-  //       //     tokendata.id,
-  //       //   ];
-
-  //       //   const updateHistory = await client.query(updateHistoryQuery, history);
-  //       await client.query("COMMIT");
-
-  //       return encrypt(
-  //         {
-  //           success: true,
-  //           message: "Ground booked  successfully",
-  //           Result: Result,
-  //           token: tokens,
-  //         },
-  //         true
-  //       );
-  //     } catch (error: unknown) {
-  //       console.log("error", error);
-  //       await client.query("ROLLBACK");
-
-  //       return encrypt(
-  //         {
-  //           success: false,
-  //           message: "An unknown error occurred during Ground booked",
-  //           token: tokens,
-  //           error: String(error),
-  //         },
-  //         true
-  //       );
-  //     } finally {
-  //       client.release();
-  //     }
-  //   }
   public async loginV1(user_data: any, domain_code?: any): Promise<any> {
     const client: PoolClient = await getClient();
 
@@ -140,7 +59,7 @@ export class userRepository {
         );
       }
 
-      const { refUserTypeId } = users.rows[0];
+      const { refUserTypeId, refUserFname, refCustId } = users.rows[0];
 
       const user = users.rows[0];
 
@@ -205,6 +124,8 @@ export class userRepository {
           message: "Login successful",
           userId: user.refUserId,
           roleId: refUserTypeId,
+          name: refUserFname,
+          custId: refCustId,
           token: generateTokenWithExpire(tokenData, true),
         },
         true
@@ -222,6 +143,149 @@ export class userRepository {
       client.release();
     }
   }
+  // public async userGroundBookingV1(
+  //   userData: any,
+  //   tokendata: any
+  // ): Promise<any> {
+  //   console.log("userData", userData);
+  //   const client: PoolClient = await getClient();
+  //   const token = { id: tokendata.id };
+  //   const tokens = generateTokenWithExpire(token, true);
+
+  //   try {
+  //     const generateDateRange = (start: string, end: string): string[] => {
+  //       const dateArray: string[] = [];
+  //       const currentDate = new Date(start);
+  //       const stopDate = new Date(end);
+
+  //       while (currentDate <= stopDate) {
+  //         // Format YYYY-MM-DD
+  //         dateArray.push(currentDate.toISOString().split("T")[0]);
+  //         currentDate.setDate(currentDate.getDate() + 1);
+  //       }
+
+  //       return dateArray;
+  //     };
+  //     await client.query("BEGIN");
+
+  //     const {
+  //       refGroundId,
+  //       isAddonNeeded,
+  //       refBookingTypeId,
+  //       refBookingStartDate,
+  //       refBookingEndDate,
+  //       refStartTime,
+  //       refEndTime,
+  //       additionalNotes,
+  //     } = userData;
+
+  //     const refAddOnsId = isAddonNeeded
+  //       ? `{${userData.refAddOnsId.join(",")}}`
+  //       : null;
+
+  //     const endDate = refBookingTypeId === 1 ? refBookingEndDate : null;
+
+  //     const params = [
+  //       tokendata.id,
+  //       refGroundId,
+  //       refBookingTypeId,
+  //       refAddOnsId,
+  //       refBookingStartDate,
+  //       endDate,
+  //       refStartTime,
+  //       refEndTime,
+  //       additionalNotes,
+  //       CurrentTime(),
+  //       tokendata.id,
+  //     ];
+
+  //     console.log("params", params);
+
+  //     const getGroundPrice = await executeQuery(getGroundPriceQuery, [
+  //       refGroundId,
+  //     ]);
+  //     console.log('getGroundPrice', getGroundPrice)
+
+  //     // const { refGroundPrice } = getGroundPrice[0];
+  //     const refGroundPrice = Number(getGroundPrice[0]?.refGroundPrice || 0);
+  //     console.log('refGroundPrice', refGroundPrice)
+
+  //     let totalAmount = 0;
+  //     if (refBookingTypeId === 1 && refBookingStartDate && refBookingEndDate) {
+  //       const dateList = generateDateRange(
+  //         refBookingStartDate,
+  //         refBookingEndDate
+  //       );
+  //       totalAmount = dateList.length * refGroundPrice;
+  //       console.log('totalAmount', totalAmount)
+  //     } else {
+  //       totalAmount = refGroundPrice;
+  //       console.log('totalAmount', totalAmount)
+  //     }
+
+  //     const result = await client.query(adduserBookingQuery, params);
+  //     console.log('result', result.rows)
+
+  //      // Add unavailable dates for add-ons
+  //   if (isAddonNeeded && Array.isArray(refAddOns)) {
+  //     for (const addOn of refAddOns) {
+  //       const { refAddOnsId, selectedDates } = addOn;
+  //       for (const date of selectedDates) {
+
+  //         const insertParams = [
+  //           date,
+  //           refAddOnsId,
+  //           CurrentTime(),
+  //           tokendata.id,
+  //           refGroundId
+  //         ];
+  //         await client.query(insertUnavailableQuery, insertParams);
+  //       }
+  //     }
+  //   }
+
+  //   // const result2 = await client.query(adduserBookingQuery, params);
+  //   // console.log('result', result.rows);
+
+  //     const history = [
+  //       28,
+  //       tokendata.id,
+  //       `Ground booked successfully`,
+  //       CurrentTime(),
+  //       tokendata.id,
+  //     ];
+
+  //     const updateHistory = await client.query(updateHistoryQuery, history);
+  //     await client.query("COMMIT");
+
+  //     return encrypt(
+  //       {
+  //         success: true,
+  //         message: "Ground booked successfully",
+  //         result,
+  //         totalAmount:totalAmount,
+  //         token: tokens,
+  //       },
+  //       true
+  //     );
+  //   } catch (error: unknown) {
+  //     console.error("Ground booking error:", error);
+  //     await client.query("ROLLBACK");
+
+  //     return encrypt(
+  //       {
+  //         success: false,
+  //         message: "An error occurred during ground booking",
+  //         error: String(error),
+  //         token: tokens,
+  //       },
+  //       true
+  //     );
+  //   } finally {
+  //     client.release();
+  //   }
+  // }
+
   public async userGroundBookingV1(
     userData: any,
     tokendata: any
@@ -231,36 +295,57 @@ export class userRepository {
     const token = { id: tokendata.id };
     const tokens = generateTokenWithExpire(token, true);
 
+    const generateDateRange = (start: string, end: string): string[] => {
+      const parseDMY = (dateStr: string): Date => {
+        const [day, month, year] = dateStr.split("-").map(Number);
+        return new Date(year, month - 1, day); // JS months are 0-based
+      };
+
+      const formatDMY = (date: Date): string => {
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+      };
+
+      const dateArray: string[] = [];
+      const currentDate = parseDMY(start);
+      const stopDate = parseDMY(end);
+
+      while (currentDate <= stopDate) {
+        dateArray.push(formatDMY(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return dateArray;
+    };
+
     try {
       await client.query("BEGIN");
 
       const {
         refGroundId,
-        isFoodNeeded,
-        refComboId,
-        refComboCount,
+        isAddonNeeded,
         refBookingTypeId,
-        isRoomNeeded,
         refBookingStartDate,
         refBookingEndDate,
         refStartTime,
         refEndTime,
         additionalNotes,
+        refAddOns = [],
       } = userData;
 
-      const food = isFoodNeeded === true;
-      const comboId = food ? refComboId : null;
-      const comboCount = food ? refComboCount : null;
+      const refAddOnsId = isAddonNeeded
+        ? `{${refAddOns.map((a: any) => a.refAddOnsId).join(",")}}`
+        : null;
+
       const endDate = refBookingTypeId === 1 ? refBookingEndDate : null;
 
       const params = [
         tokendata.id,
         refGroundId,
-        food,
-        comboId,
-        comboCount,
         refBookingTypeId,
-        isRoomNeeded,
+        refAddOnsId,
         refBookingStartDate,
         endDate,
         refStartTime,
@@ -270,8 +355,93 @@ export class userRepository {
         tokendata.id,
       ];
 
-      console.log("params", params);
       const result = await client.query(adduserBookingQuery, params);
+      console.log("result", result.rows);
+
+      console.log("params", params);
+
+      const getGroundPrice = await executeQuery(getGroundPriceQuery, [
+        refGroundId,
+      ]);
+      const refGroundPrice = Number(getGroundPrice[0]?.refGroundPrice || 0);
+      console.log("refGroundPrice", refGroundPrice);
+
+      let totalAmount = 0;
+      if (refBookingTypeId === 1 && refBookingStartDate && refBookingEndDate) {
+        const dateList = generateDateRange(
+          refBookingStartDate,
+          refBookingEndDate
+        );
+        totalAmount = dateList.length * refGroundPrice;
+      } else {
+        totalAmount = refGroundPrice;
+      }
+
+      // Add unavailable dates for add-ons
+      //       if (isAddonNeeded && Array.isArray(refAddOns)) {
+      //         for (const addOn of refAddOns) {
+      //           const { refAddOnsId, selectedDates } = addOn;
+      //           for (const date of selectedDates) {
+      //             const insertUnavailableQuery = `
+      //            INSERT INTO
+      //            public."addOnUnAvailability" (
+      //           "unAvailabilityDate",
+      //             "refAddOnsId",
+      //            "refGroundId",
+      //            "createdAt",
+      //            "createdBy"
+      //   )
+      // VALUES
+      //   ($1, $2, $3, $4, $5)
+      //           `;
+      //             const insertParams = [
+      //               date,
+      //               refAddOnsId,
+      //               refGroundId,
+      //               CurrentTime(),
+      //               tokendata.id,
+      //             ];
+      //             await client.query(insertUnavailableQuery, insertParams);
+      //           }
+      //         }
+      //       }
+      if (isAddonNeeded && Array.isArray(refAddOns)) {
+        const bookingRangeDates =
+          refBookingTypeId === 1 && refBookingStartDate && refBookingEndDate
+            ? generateDateRange(refBookingStartDate, refBookingEndDate)
+            : [];
+
+        for (const addOn of refAddOns) {
+          const { refAddOnsId, selectedDates = [] } = addOn;
+
+          // Merge selectedDates with bookingRangeDates and remove duplicates
+          const allDates = Array.from(
+            new Set([...selectedDates, ...bookingRangeDates])
+          );
+
+          for (const date of allDates) {
+            const insertUnavailableQuery = `
+        INSERT INTO public."addOnUnAvailability" (
+          "unAvailabilityDate", 
+          "refAddOnsId",
+          "refGroundId",
+          "createdAt",
+          "createdBy"
+        )
+        VALUES ($1, $2, $3, $4, $5)
+      `;
+            const insertParams = [
+              date,
+              refAddOnsId,
+              refGroundId,
+              CurrentTime(),
+              tokendata.id,
+            ];
+            await client.query(insertUnavailableQuery, insertParams);
+          }
+        }
+      }
+
       const history = [
         28,
         tokendata.id,
@@ -280,7 +450,7 @@ export class userRepository {
         tokendata.id,
       ];
 
-      const updateHistory = await client.query(updateHistoryQuery, history);
+      await client.query(updateHistoryQuery, history);
       await client.query("COMMIT");
 
       return encrypt(
@@ -288,6 +458,7 @@ export class userRepository {
           success: true,
           message: "Ground booked successfully",
           result,
+          totalAmount,
           token: tokens,
         },
         true
@@ -309,6 +480,7 @@ export class userRepository {
       client.release();
     }
   }
+
   public async listFilteredGroundsV1(
     userData: any,
     tokendata: any
@@ -352,6 +524,24 @@ export class userRepository {
     try {
       const result = await executeQuery(listGroundsQuery);
 
+      for (const product of result) {
+        if (product.refGroundImage) {
+          try {
+            const fileBuffer = await viewFile(product.refGroundImage);
+            product.refGroundImage = {
+              filename: path.basename(product.refGroundImage),
+              content: fileBuffer.toString("base64"),
+              contentType: "image/jpeg", // Change based on actual file type if necessary
+            };
+          } catch (err) {
+            console.error(
+              "Error reading image file for product ${product.productId}:",
+              err
+            );
+            product.refGroundImage = null; // Handle missing or unreadable files gracefully
+          }
+        }
+      }
       return encrypt(
         {
           success: true,
@@ -803,17 +993,12 @@ export class userRepository {
       );
     }
   }
-  public async userAuditPageV1(
-    userData: any,
-    tokendata: any
-  ): Promise<any> {
+  public async userAuditPageV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id };
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listUserAuditPageQuery, [
-        tokendata.id,
-      ]);
+      const result = await executeQuery(listUserAuditPageQuery, [tokendata.id]);
 
       return encrypt(
         {
@@ -838,5 +1023,168 @@ export class userRepository {
       );
     }
   }
-  
+  public async getGroundsV1(userData: any, tokendata: any): Promise<any> {
+    const token = { id: tokendata.id };
+    const tokens = generateTokenWithExpire(token, true);
+
+    try {
+      const result = await executeQuery(getGroundsQuery, [
+        userData.refGroundId,
+      ]);
+
+      const groundUnavailableDate = await executeQuery(
+        getGroundUnavailableDateQuery,
+        [userData.refGroundId]
+      );
+      for (const product of result) {
+        if (product.refGroundImage) {
+          try {
+            const fileBuffer = await viewFile(product.refGroundImage);
+            product.refGroundImage = {
+              filename: path.basename(product.refGroundImage),
+              content: fileBuffer.toString("base64"),
+              contentType: "image/jpeg", // Change based on actual file type if necessary
+            };
+          } catch (err) {
+            console.error(
+              "Error reading image file for product ${product.productId}:",
+              err
+            );
+            product.refGroundImage = null; // Handle missing or unreadable files gracefully
+          }
+        }
+      }
+      return encrypt(
+        {
+          success: true,
+          message: "Ground listed successfully",
+          token: tokens,
+          groundResult: result, // Return deleted record for reference
+          groundUnavailableDate: groundUnavailableDate,
+        },
+        true
+      );
+    } catch (error: unknown) {
+      console.error("Error list Ground data ", error);
+
+      return encrypt(
+        {
+          success: false,
+          message: "An error occurred while list Ground data",
+          token: tokens,
+          error: String(error),
+        },
+        true
+      );
+    }
+  }
+  public async getUnavailableAddonsV1(
+    userData: any,
+    tokendata: any
+  ): Promise<any> {
+    const token = { id: tokendata.id };
+    const tokens = generateTokenWithExpire(token, true);
+    const client: PoolClient = await getClient();
+
+    try {
+      await client.query("BEGIN");
+
+      const { fromDate, toDate, refGroundId } = userData;
+      console.log("userData", userData);
+
+      const result = await executeQuery(listUnavailableAddonsQuery);
+
+      const addons = await executeQuery(listaddonsQuery);
+
+      const groundUnavailableDate = await executeQuery(
+        getGroundUnavailableDateQuery,
+        [userData.refGroundId]
+      );
+      // 🧠 Helper function to generate date list
+      const generateDateRange = (start: string, end: string): string[] => {
+        const parseDMY = (dateStr: string): Date => {
+          const [day, month, year] = dateStr.split("-").map(Number);
+          return new Date(year, month - 1, day); // JS months are 0-based
+        };
+
+        const formatDMY = (date: Date): string => {
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = date.getFullYear();
+          return `${day}-${month}-${year}`;
+        };
+
+        const dateArray: string[] = [];
+        const currentDate = parseDMY(start);
+        const stopDate = parseDMY(end);
+
+        while (currentDate <= stopDate) {
+          dateArray.push(formatDMY(currentDate));
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return dateArray;
+      };
+
+      // ✅ Generate the list of dates
+      // const dateList = generateDateRange(fromDate, toDate);
+      // for (const date of dateList) {
+      //   const insertParams = [
+      //     date,
+      //     // refAddOnsId,
+      //     refGroundId,
+      //     CurrentTime(),
+      //     tokendata.id,
+      //   ];
+      //   const result2 = await client.query(
+      //     addUnavailbleDatesQuery,
+      //     insertParams
+      //   );
+      // }
+
+      const getGroundPrice = await executeQuery(getGroundPriceQuery, [
+        refGroundId,
+      ]);
+      console.log("getGroundPrice", getGroundPrice);
+
+      const refGroundPrice = Number(getGroundPrice[0]?.refGroundPrice || 0);
+      console.log("refGroundPrice", refGroundPrice);
+
+      let totalAmount = 0;
+      if (fromDate && toDate) {
+        const dateList = generateDateRange(fromDate, toDate);
+        console.log("dateList", dateList);
+        totalAmount = dateList.length * refGroundPrice;
+      } else {
+        totalAmount = refGroundPrice;
+      }
+      await client.query("COMMIT");
+
+      return encrypt(
+        {
+          success: true,
+          message: "Unavailable Addons data listed successfully",
+          token: tokens,
+          result: result, // Return deleted record for reference
+          addons: addons,
+          groundUnavailableDates: groundUnavailableDate,
+          totalAmount: totalAmount,
+        },
+        true
+      );
+    } catch (error: unknown) {
+      console.error("Error list Unavailable Addons data ", error);
+      await client.query("ROLLBACK");
+
+      return encrypt(
+        {
+          success: false,
+          message: "An error occurred while list Unavailable Addons data",
+          token: tokens,
+          error: String(error),
+        },
+        true
+      );
+    }
+  }
 }

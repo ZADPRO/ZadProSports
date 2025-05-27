@@ -29,7 +29,7 @@ export class userRoutes implements IRoute {
           config: {
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.userGroundBooking,
-            validate: validate.userGroundBooking,
+            // validate: validate.userGroundBooking,
             description: "user SignUp",
             tags: ["api", "Users"],
             auth: false,
@@ -136,6 +136,28 @@ export class userRoutes implements IRoute {
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.userAuditPage,
             description: "userAuditPage",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
+        {
+          method: "POST",
+          path: "/api/v1/userRoutes/getGrounds",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.getGrounds,
+            description: "getGrounds",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
+        {
+          method: "POST",
+          path: "/api/v1/userRoutes/getUnavailableAddons",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.getUnavailableAddons,
+            description: "getUnavailableAddons",
             tags: ["api", "Users"],
             auth: false,
           },
