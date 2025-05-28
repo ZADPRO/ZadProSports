@@ -101,6 +101,7 @@ export default {
     payload: Joi.object({
       unAvailabilityDate: Joi.string().required(),
       refAddOnsId: Joi.number().integer().required(),
+      refGroundId: Joi.number().integer().required(),
     }),
     headers: Joi.object({
       authorization: Joi.string().optional(),
@@ -111,6 +112,7 @@ export default {
       addOnsAvailabilityId: Joi.number().integer().required(),
       addOnsUnAvailabilityId: Joi.string().required(),
       refAddOnsId: Joi.number().integer().required(),
+      refGroundId: Joi.number().integer().required(),
     }),
     headers: Joi.object({
       authorization: Joi.string().optional(),
@@ -124,5 +126,4 @@ export default {
       authorization: Joi.string().optional(),
     }).unknown(),
   },
-
 };

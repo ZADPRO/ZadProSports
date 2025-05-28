@@ -13,7 +13,6 @@ import {
   generateTokenWithoutExpire,
 } from "../../helper/token";
 
-
 import { CurrentTime } from "../../helper/common";
 import {
   checkEmailQuery,
@@ -51,8 +50,7 @@ export class adminRepository {
 
       const userCheck = await executeQuery(checkMobileQuery, checkmobile);
       const mobliecount = Number(userCheck[0]?.count || 0); // safely convert to number
-      console.log('count', mobliecount)
-      
+      console.log("count", mobliecount);
 
       if (mobliecount > 0) {
         await client.query("ROLLBACK");
@@ -66,8 +64,7 @@ export class adminRepository {
       }
       const userEMailCheck = await executeQuery(checkEmailQuery, checkEmail);
       const count = Number(userEMailCheck[0]?.count || 0); // safely convert to number
-      console.log('count', count)
-      
+      console.log("count", count);
 
       if (count > 0) {
         await client.query("ROLLBACK");
@@ -143,8 +140,8 @@ export class adminRepository {
             success: true,
             message: "User signed up added successful",
             user: newUser,
-            firstName:refFName,
-            lastName:refLName
+            firstName: refFName,
+            lastName: refLName,
           },
           true
         );
@@ -168,6 +165,8 @@ export class adminRepository {
     const client: PoolClient = await getClient();
 
     try {
+      await client.query("BEGIN");
+
       const params = [user_data.login];
       const users: any = await client.query(selectUserByLogin, params);
       // console.log('users line -------- 31 \n', users)
@@ -240,6 +239,7 @@ export class adminRepository {
       ];
 
       await client.query(updateHistoryQuery, history);
+      await client.query("COMMIT");
 
       return encrypt(
         {
@@ -252,6 +252,8 @@ export class adminRepository {
         true
       );
     } catch (error) {
+      await client.query("ROLLBACK");
+
       console.error("Error during login:", error);
       return encrypt(
         {

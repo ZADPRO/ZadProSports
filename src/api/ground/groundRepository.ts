@@ -35,6 +35,7 @@ import {
   listAddonesAvailabilityQuery,
   getAvailableAddonsQuery,
   listaddonsQuery,
+  imgResultQuery,
 } from "./query";
 import { CurrentTime } from "../../helper/common";
 
@@ -179,6 +180,7 @@ export class groundRepository {
         refDescription,
         refStatus,
       } = userData;
+      console.log('userData', userData)
 
       const refAddon = isAddOnAvailable ? userData.refAddon : null;
       const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
@@ -211,9 +213,9 @@ export class groundRepository {
       ];
       console.log("params", params);
       const Result = await client.query(updateGroundQuery, params);
-      //   console.log("userResult", userResult);
+      console.log('Result', Result)
 
-      const result = await client.query(updateAddOnsQuery, [
+      const result2 = await client.query(updateAddOnsQuery, [
         refAddOnsId,
         refAddon,
         refGroundId,
@@ -221,6 +223,7 @@ export class groundRepository {
         CurrentTime(),
         tokendata.id,
       ]);
+      console.log('result2', result2)
 
       const history = [
         25,
@@ -239,7 +242,7 @@ export class groundRepository {
           message: "Ground updated successfully",
           Result: Result,
           token: tokens,
-          addon: result,
+          addon: result2,
         },
         true
       );
@@ -506,7 +509,6 @@ export class groundRepository {
       const result = await executeQuery(listGroundQuery);
       const addons = await executeQuery(listaddonsQuery);
 
-
       // for (const product of result) {
       //   if (product.refGroundImage) {
       //     try {
@@ -532,7 +534,7 @@ export class groundRepository {
           message: "ground listed successfully",
           token: tokens,
           result: result, // Return deleted record for reference
-          addons:addons
+          addons: addons,
         },
         true
       );
@@ -625,29 +627,48 @@ export class groundRepository {
       const { refGroundId } = userData;
       const result: any = await client.query(getGroundQuery, [refGroundId]);
 
-      const getAddons = await executeQuery(getAvailableAddonsQuery, [refGroundId]);
+      const getAddons = await executeQuery(getAvailableAddonsQuery, [
+        refGroundId,
+      ]);
 
-            const addons = await executeQuery(listaddonsQuery);
+      const addons = await executeQuery(listaddonsQuery);
 
-      // for (const product of result) {
-      //   if (product.refGroundImage) {
+      const imgResult = await executeQuery(imgResultQuery, [refGroundId]);
+      console.log("imgResult", imgResult);
+
+      //  for (const image of imgResult) {
+      //   if (image.refGroundImage) {
       //     try {
-      //       const fileBuffer = await viewFile(product.refGroundImage);
-      //       product.refGroundImage = {
-      //         filename: path.basename(product.refGroundImage),
+      //       const fileBuffer = await viewFile(image.refGroundImage);
+      //       image.refGroundImage = {
+      //         filename: path.basename(image.refGroundImage),
       //         content: fileBuffer.toString("base64"),
-      //         contentType: "image/jpeg", // Change based on actual file type if necessary
+      //         contentType: "image/jpeg", // Change based on actuwal file type if necessary
       //       };
-      //     } catch (err) {
-      //       console.error(
-      //         "Error reading image file for product ${product.productId}:",
-      //         err
-      //       );
-      //       product.refGroundImage = null; // Handle missing or unreadable files gracefully
+      //     } catch (error) {
+      //       console.error("Error reading image file for product ,err");
+      //       image.refGroundImage = null; // Handle missing or unreadable files gracefully
       //     }
       //   }
       // }
-
+      for (const product of imgResult) {
+        if (product.refGroundImage) {
+          try {
+            const fileBuffer = await viewFile(product.refGroundImage);
+            product.refGroundImage = {
+              filename: path.basename(product.refGroundImage),
+              content: fileBuffer.toString("base64"),
+              contentType: "image/jpeg", // Change based on actual file type if necessary
+            };
+          } catch (err) {
+            console.error(
+              "Error reading image file for product ${product.productId}:",
+              err
+            );
+            product.refGroundImage = null; // Handle missing or unreadable files gracefully
+          }
+        }
+      }
 
       await client.query("COMMIT"); // Commit transaction
 
@@ -656,9 +677,10 @@ export class groundRepository {
           success: true,
           message: "ground get successfully",
           token: tokens,
-          result: result.rows[0], 
-          getAddons:getAddons,// Return deleted record for reference
-          listOfAddones:addons
+          result: result.rows[0],
+          getAddons: getAddons, // Return deleted record for reference
+          listOfAddones: addons,
+          imgResult:imgResult
         },
         true
       );
@@ -729,6 +751,8 @@ export class groundRepository {
         },
         true
       );
+    } finally {
+      client.release();
     }
   }
   public async updateAddonsV1(userData: any, tokendata: any): Promise<any> {
@@ -783,6 +807,8 @@ export class groundRepository {
         },
         true
       );
+    } finally {
+      client.release();
     }
   }
   public async deleteAddonsV1(userData: any, tokendata: any): Promise<any> {
@@ -885,6 +911,7 @@ export class groundRepository {
     tokendata: any
   ): Promise<any> {
     const token = { id: tokendata.id };
+    console.log("tokendata.id", tokendata.id);
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 
@@ -934,6 +961,8 @@ export class groundRepository {
         },
         true
       );
+    } finally {
+      client.release();
     }
   }
   public async updateAddonAvailabilityV1(
@@ -997,6 +1026,8 @@ export class groundRepository {
         },
         true
       );
+    } finally {
+      client.release();
     }
   }
   public async deleteAddonAvailabilityV1(
@@ -1077,7 +1108,7 @@ export class groundRepository {
       // const result = await executeQuery(listAddonesAvailabilityQuery);
       const result = await executeQuery(listAddonesAvailabilityQuery); // returns array of rows
 
-      console.log('result', result)
+      console.log("result", result);
 
       return encrypt(
         {

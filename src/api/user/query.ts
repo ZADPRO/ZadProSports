@@ -25,6 +25,7 @@ INSERT INTO
     "refStartTime",
     "refEndTime",
     "additionalNotes",
+    "retTotalAmount",
     "createdAt",
     "createdBy"
   )
@@ -40,7 +41,8 @@ VALUES
     $8,
     $9,
     $10,
-    $11
+    $11,
+    $12
   )
 RETURNING
   *;
@@ -284,6 +286,55 @@ RETURNING
   *;
 `;
 
+// export const listUserBookingHistoryQuery = `
+// SELECT
+//   ub.*,
+//   rg."refGroundName",
+//   rg."refGroundCustId",
+//   rg."isAddOnAvailable",
+//   rg."refGroundPrice",
+//   rg."refGroundLocation",
+//   rg."refGroundPincode",
+//   rg."refGroundState",
+//   (
+//     SELECT json_agg(DISTINCT jsonb_build_object(
+//       'addOnId', ao."refAddOnsId",
+//       'addon', ao."refAddOn",
+//       'selectedDates', (
+//         SELECT array_agg(aa."unAvailabilityDate")
+//         FROM public."addOnUnAvailability" aa
+//         WHERE aa."refAddOnsId" = ao."refAddOnsId"
+//           AND aa."refGroundId" = ub."refGroundId"
+//           AND aa."isDelete" IS NOT true
+//       )
+//     ))
+//     FROM public."refAddOns" ao
+//     WHERE ao."refAddOnsId" = ANY (
+//       string_to_array(
+//         regexp_replace(ub."refAddOnsId", '[{}]', '', 'g'),
+//         ','
+//       )::INTEGER[]
+//     )
+//     AND ao."refStatus" IS true
+//   ) AS "AddOn"
+// FROM
+//   public."refUserBooking" ub
+//   LEFT JOIN public."refGround" rg ON CAST(rg."refGroundId" AS INTEGER) = ub."refGroundId"
+// WHERE
+//   ub."refUserId" = $1
+//   AND ub."isDelete" IS NOT true
+// GROUP BY
+//   ub."refUserBookingId",
+//   rg."refGroundName",
+//   rg."refGroundCustId",
+//   rg."isAddOnAvailable",
+//   rg."refGroundPrice",
+//   rg."refGroundLocation",
+//   rg."refGroundPincode",
+//   rg."refGroundState"
+
+// `;
+
 export const listUserBookingHistoryQuery = `
 SELECT
   ub.*,
@@ -295,25 +346,53 @@ SELECT
   rg."refGroundPincode",
   rg."refGroundState",
   (
-    SELECT json_agg(DISTINCT jsonb_build_object(
-      'addOnId', ao."refAddOnsId",
-      'addon', ao."refAddOn",
-      'selectedDates', (
-        SELECT array_agg(aa."unAvailabilityDate")
-        FROM public."addOnUnAvailability" aa
-        WHERE aa."refAddOnsId" = ao."refAddOnsId"
-          AND aa."refGroundId" = ub."refGroundId"
-          AND aa."isDelete" IS NOT true
+    SELECT
+      COALESCE(
+        json_agg(addon_data) FILTER (
+          WHERE
+            jsonb_array_length(addon_data -> 'selectedDates') > 0
+        ),
+        '[]'::json
       )
-    ))
-    FROM public."refAddOns" ao
-    WHERE ao."refAddOnsId" = ANY (
-      string_to_array(
-        regexp_replace(ub."refAddOnsId", '[{}]', '', 'g'),
-        ','
-      )::INTEGER[]
-    )
-    AND ao."refStatus" IS true
+    FROM
+      (
+        SELECT
+          jsonb_build_object(
+            'addOnId',
+            ao."refAddOnsId",
+            'addon',
+            ao."refAddOn",
+            'selectedDates',
+            COALESCE(
+              (
+                SELECT
+                  json_agg(
+                    DISTINCT aa."unAvailabilityDate"
+                    ORDER BY
+                      aa."unAvailabilityDate"
+                  )
+                FROM
+                  public."addOnUnAvailability" aa
+                WHERE
+                  aa."refAddOnsId" = ao."refAddOnsId"
+                  AND aa."refGroundId" = ub."refGroundId"
+                  AND aa."isDelete" IS NOT true
+                  AND aa."createdAt" = ub."createdAt"
+              ),
+              '[]'::json
+            )
+          ) AS addon_data
+        FROM
+          public."refAddOns" ao
+        WHERE
+          ao."refAddOnsId" = ANY (
+            string_to_array(
+              regexp_replace(ub."refAddOnsId", '[{}]', '', 'g'),
+              ','
+            )::INTEGER[]
+          )
+          AND ao."refStatus" IS true
+      ) AS addon_subquery
   ) AS "AddOn"
 FROM
   public."refUserBooking" ub
@@ -330,8 +409,10 @@ GROUP BY
   rg."refGroundLocation",
   rg."refGroundPincode",
   rg."refGroundState"
+ORDER BY
+  ub."refUserBookingId" DESC;
+      `;
 
-`;
 
 export const listUserAuditPageQuery = `
 SELECT

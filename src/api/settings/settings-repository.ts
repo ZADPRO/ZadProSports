@@ -2022,7 +2022,7 @@ export class settingsRepository {
         return encrypt(
           {
             success: false,
-            message: "Additional Tips not found or already deleted",
+            message: "FoodCombo not found or already deleted",
             token: tokens,
           },
           true
@@ -2054,7 +2054,7 @@ export class settingsRepository {
       const history = [
         23, // Unique ID for delete action
         tokendata.id,
-        `Additional Tips deleted succesfully`,
+        `Food Combo deleted succesfully`,
         CurrentTime(),
         tokendata.id,
       ];
@@ -2065,7 +2065,7 @@ export class settingsRepository {
       return encrypt(
         {
           success: true,
-          message: "Additional Tips deleted successfully",
+          message: "Food Combo deleted successfully",
           token: tokens,
           deletedData: result.rows[0], // Return deleted record for reference
         },

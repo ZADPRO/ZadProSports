@@ -264,22 +264,30 @@ GROUP BY
     `;
 
 export const getAvailableAddonsQuery = `
- SELECT
-  json_agg(json_build_object(
-    'addOnsAvailabilityId', aa."addOnsAvailabilityId",
-    'refAddOnsId', ao."refAddOnsId",
-    'refAddOn', ao."refAddOn",
-    'refGroundId', ao."refGroundId",
-    'unAvailabilityDate', aa."unAvailabilityDate"
-  )) AS arraydata
+SELECT
+  json_agg(
+    json_build_object(
+      'addOnsAvailabilityId',
+      aa."addOnsAvailabilityId",
+      'refAddOnsId',
+      ao."refAddOnsId",
+      'refAddOn',
+      ao."refAddOn",
+      'refGroundId',
+      ao."refGroundId",
+      'unAvailabilityDate',
+      aa."unAvailabilityDate"
+    )
+  ) AS arraydata
 FROM
   public."addOnUnAvailability" aa
   LEFT JOIN public."refAddOns" ao ON CAST(ao."refAddOnsId" AS INTEGER) = aa."refAddOnsId"
 WHERE
   aa."isDelete" IS NOT true
   AND aa."refGroundId" = $1
-  AND ao."refStatus" IS true;
-
+  AND ao."refAddOnsId" != '1'
+  AND ao."refStatus" IS true
+AND aa."createdBy"::INTEGER = '1'::INTEGER
   `;
 
 export const listBookedDatesQuery = `
@@ -293,6 +301,16 @@ WHERE
   AND u."refBookingStartDate"::Date >= NOW()::date
   OR u."refBookingEndDate"::date >= NOW()::date
 `;
+
+export const imgResultQuery = `
+SELECT
+  *
+FROM
+  public."refGround"
+WHERE
+  "refGroundId" = $1
+`;
+
 
 export const addAddOnsQuery = `
 INSERT INTO
