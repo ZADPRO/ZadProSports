@@ -34,6 +34,7 @@ import {
   deleteAddonsAvailabilityQuery,
   listAddonesAvailabilityQuery,
   getAvailableAddonsQuery,
+  listaddonsQuery,
 } from "./query";
 import { CurrentTime } from "../../helper/common";
 
@@ -503,6 +504,7 @@ export class groundRepository {
 
     try {
       const result = await executeQuery(listGroundQuery);
+      const addons = await executeQuery(listaddonsQuery);
 
 
       // for (const product of result) {
@@ -530,6 +532,7 @@ export class groundRepository {
           message: "ground listed successfully",
           token: tokens,
           result: result, // Return deleted record for reference
+          addons:addons
         },
         true
       );
@@ -624,6 +627,8 @@ export class groundRepository {
 
       const getAddons = await executeQuery(getAvailableAddonsQuery, [refGroundId]);
 
+            const addons = await executeQuery(listaddonsQuery);
+
       // for (const product of result) {
       //   if (product.refGroundImage) {
       //     try {
@@ -652,7 +657,8 @@ export class groundRepository {
           message: "ground get successfully",
           token: tokens,
           result: result.rows[0], 
-          getAddons:getAddons// Return deleted record for reference
+          getAddons:getAddons,// Return deleted record for reference
+          listOfAddones:addons
         },
         true
       );

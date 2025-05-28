@@ -332,6 +332,7 @@ export class userRepository {
         refStartTime,
         refEndTime,
         additionalNotes,
+        
         refAddOns = [],
       } = userData;
 

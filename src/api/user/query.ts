@@ -219,14 +219,16 @@ GROUP BY
 export const listProfleDataQuery = `
 SELECT
   u.*,
-  ud."refUserEmail",
-  ud."refUsername"
+  ud."refEmail",
+  ud."refMobileNumber"
 FROM
   public."users" u
-  LEFT JOIN public."refUserDomain" ud ON CAST (ud."refUserId" AS INTEGER) = u."refuserId"
+  LEFT JOIN public."refUsersDomain" ud ON CAST (ud."refUserId" AS INTEGER) = u."refuserId"
 WHERE
   u."refuserId" = $1
+
 `;
+
 
 export const updateUserDataQuery = `
 UPDATE

@@ -399,3 +399,15 @@ WHERE
   "isDelete" IS NOT true
   AND "createdBy"::INTEGER = '1'::INTEGER
 `;
+
+
+export const listaddonsQuery = `
+SELECT
+  *
+FROM
+  public."refAddOns"
+WHERE
+  "refStatus" IS true
+  AND "isDelete" IS NOT true
+  AND "refAddOn" != 'Ground'
+`;
