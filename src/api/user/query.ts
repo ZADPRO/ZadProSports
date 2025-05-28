@@ -27,7 +27,10 @@ INSERT INTO
     "additionalNotes",
     "retTotalAmount",
     "createdAt",
-    "createdBy"
+    "createdBy",
+    "refBookingAmount",
+    "refSGSTAmount",
+    "refCGSTAmount"
   )
 VALUES
   (
@@ -42,7 +45,10 @@ VALUES
     $9,
     $10,
     $11,
-    $12
+    $12,
+    $13,
+    $14,
+    $15
   )
 RETURNING
   *;
@@ -349,50 +355,33 @@ SELECT
     SELECT
       COALESCE(
         json_agg(addon_data) FILTER (
-          WHERE
-            jsonb_array_length(addon_data -> 'selectedDates') > 0
+          WHERE jsonb_array_length(addon_data -> 'selectedDates') > 0
         ),
         '[]'::json
       )
-    FROM
-      (
-        SELECT
-          jsonb_build_object(
-            'addOnId',
-            ao."refAddOnsId",
-            'addon',
-            ao."refAddOn",
-            'selectedDates',
-            COALESCE(
-              (
-                SELECT
-                  json_agg(
-                    DISTINCT aa."unAvailabilityDate"
-                    ORDER BY
-                      aa."unAvailabilityDate"
-                  )
-                FROM
-                  public."addOnUnAvailability" aa
-                WHERE
-                  aa."refAddOnsId" = ao."refAddOnsId"
-                  AND aa."refGroundId" = ub."refGroundId"
-                  AND aa."isDelete" IS NOT true
-                  AND aa."createdAt" = ub."createdAt"
-              ),
-              '[]'::json
-            )
-          ) AS addon_data
-        FROM
-          public."refAddOns" ao
-        WHERE
-          ao."refAddOnsId" = ANY (
-            string_to_array(
-              regexp_replace(ub."refAddOnsId", '[{}]', '', 'g'),
-              ','
-            )::INTEGER[]
-          )
-          AND ao."refStatus" IS true
-      ) AS addon_subquery
+    FROM (
+      SELECT
+        jsonb_build_object(
+          'addOnId', ao."refAddOnsId",
+          'addon', ao."refAddOn",
+          'selectedDates', COALESCE(json_agg(aa."unAvailabilityDate" ORDER BY aa."unAvailabilityDate"), '[]'::json),
+          'refAddOnsPrice', COALESCE(json_agg(aa."refAddOnsPrice" ORDER BY aa."unAvailabilityDate"), '[]'::json)
+        ) AS addon_data
+      FROM
+        public."refAddOns" ao
+        LEFT JOIN public."addOnUnAvailability" aa
+          ON aa."refAddOnsId" = ao."refAddOnsId"
+          AND aa."refGroundId" = ub."refGroundId"
+          AND aa."isDelete" IS NOT true
+          AND aa."createdAt" = ub."createdAt"
+      WHERE
+        ao."refAddOnsId" = ANY (
+          string_to_array(regexp_replace(ub."refAddOnsId", '[{}]', '', 'g'), ',')::INTEGER[]
+        )
+        AND ao."refStatus" IS true
+      GROUP BY
+        ao."refAddOnsId", ao."refAddOn"
+    ) AS addon_subquery
   ) AS "AddOn"
 FROM
   public."refUserBooking" ub
@@ -411,7 +400,7 @@ GROUP BY
   rg."refGroundState"
 ORDER BY
   ub."refUserBookingId" DESC;
-      `;
+`;
 
 
 export const listUserAuditPageQuery = `

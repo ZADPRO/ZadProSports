@@ -333,6 +333,10 @@ export class userRepository {
         refEndTime,
         additionalNotes,
         refAddOns = [],
+        refTotalAmount,
+        refBookingAmount,
+        refSGSTAmount,
+        refCGSTAmount
       } = userData;
 
       console.log("userData", userData);
@@ -345,23 +349,23 @@ export class userRepository {
 
       const endDate = refBookingTypeId === 1 ? refBookingEndDate : null;
 
-      const getGroundPrice = await executeQuery(getGroundPriceQuery, [
-        refGroundId,
-      ]);
-      const refGroundPrice = Number(getGroundPrice[0]?.refGroundPrice || 0);
-      console.log("refGroundPrice", refGroundPrice);
+      // const getGroundPrice = await executeQuery(getGroundPriceQuery, [
+      //   refGroundId,
+      // ]);
+      // const refGroundPrice = Number(getGroundPrice[0]?.refGroundPrice || 0);
+      // console.log("refGroundPrice", refGroundPrice);
 
-      let totalAmount = 0;
-      if (refBookingTypeId === 1 && refBookingStartDate && refBookingEndDate) {
-        const dateList = generateDateRange(
-          refBookingStartDate,
-          refBookingEndDate
-        );
-        console.log("dateList", dateList);
-        totalAmount = dateList.length * refGroundPrice;
-      } else {
-        totalAmount = refGroundPrice;
-      }
+      // let totalAmount = 0;
+      // if (refBookingTypeId === 1 && refBookingStartDate && refBookingEndDate) {
+      //   const dateList = generateDateRange(
+      //     refBookingStartDate,
+      //     refBookingEndDate
+      //   );
+      //   console.log("dateList", dateList);
+      //   totalAmount = dateList.length * refGroundPrice;
+      // } else {
+      //   totalAmount = refGroundPrice;
+      // }
 
       const params = [
         tokendata.id,
@@ -373,9 +377,12 @@ export class userRepository {
         refStartTime,
         refEndTime,
         additionalNotes,
-        totalAmount,
+        refTotalAmount,
         CurrentTime(),
         tokendata.id,
+        refBookingAmount,
+        refSGSTAmount,
+        refCGSTAmount
       ];
 
       const result = await client.query(adduserBookingQuery, params);
@@ -388,42 +395,44 @@ export class userRepository {
             : [];
 
         for (const addOn of refAddOns) {
-          const { refAddOnsId, selectedDates = [] } = addOn;
+          const { refAddOnsId, selectedDates = [], refPrice } = addOn;
           console.log("addOn", addOn);
 
-          const combinedDates: { date: string; refAddOnsId: number }[] = [];
+          const combinedDates: { date: string; refAddOnsId: number, refPrice: string }[] = [];
 
           // Push bookingRangeDates with refAddOnsId = 1
           for (const date of bookingRangeDates) {
-            combinedDates.push({ date, refAddOnsId: 1 });
+            combinedDates.push({ date, refAddOnsId: 1, refPrice: "" });
           }
 
           // Push selectedDates with actual refAddOnsId
           for (const date of selectedDates) {
-            combinedDates.push({ date, refAddOnsId });
+            combinedDates.push({ date, refAddOnsId, refPrice });
           }
 
           console.log("combinedDates", combinedDates);
 
-          for (const { date, refAddOnsId } of combinedDates) {
+          for (const { date, refAddOnsId, refPrice } of combinedDates) {
             const insertUnavailableQuery = `
             INSERT INTO public."addOnUnAvailability" (
               "unAvailabilityDate", 
               "refAddOnsId",
               "refGroundId",
               "createdAt",
-              "createdBy"
+              "createdBy",
+              "refAddOnsPrice"
             )
-            VALUES ($1, $2, $3, $4, $5)
+            VALUES ($1, $2, $3, $4, $5, $6)
           `;
 
-          
+
             const insertParams = [
               date,
               refAddOnsId,
               refGroundId,
               CurrentTime(),
               tokendata.id,
+              refPrice
             ];
 
             const UnavailableDates = await client.query(
@@ -451,7 +460,7 @@ export class userRepository {
           success: true,
           message: "Ground booked successfully",
           result,
-          totalAmount,
+          refTotalAmount,
           token: tokens,
         },
         true
