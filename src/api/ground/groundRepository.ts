@@ -63,9 +63,10 @@ export class groundRepository {
         refStatus,
       } = userData;
 
-      const refAddon = isAddOnAvailable ? userData.refAddon : null;
-      const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
+      // const refAddon = isAddOnAvailable ? userData.refAddon : null;
+      // const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
 
+      const refAddOnsId = `{${userData.refAddOnsId.join(",")}}`;
       const refFeaturesId = `{${userData.refFeaturesId.join(",")}}`;
       const refUserGuidelinesId = `{${userData.refUserGuidelinesId.join(",")}}`;
       const refFacilitiesId = `{${userData.refFacilitiesId.join(",")}}`;
@@ -93,7 +94,7 @@ export class groundRepository {
         refGroundName,
         newCustomerId,
         isAddOnAvailable,
-        // refAddOnsId,
+        refAddOnsId,
         refFeaturesId,
         refUserGuidelinesId,
         refAdditionalTipsId,
@@ -115,11 +116,12 @@ export class groundRepository {
       //   console.log("userResult", userResult);
       const getgroundId = Result.rows[0];
 
-      const result = await client.query(addAddOnsQuery, [
-        refAddon,
-        getgroundId.refGroundId,
-        refAddonStatus,
-      ]);
+      // const result = await client.query(addAddOnsQuery, [
+      //   refAddon,
+      //   getgroundId.refGroundId,
+      //   refAddonStatus,
+      // ]);
+
       const history = [
         24,
         tokendata.id,
@@ -168,7 +170,7 @@ export class groundRepository {
         refGroundId,
         refGroundName,
         isAddOnAvailable,
-        refAddOnsId,
+        // refAddOnsId,
         // refAddon,
         // refAddonStatus,
         IframeLink,
@@ -180,11 +182,18 @@ export class groundRepository {
         refDescription,
         refStatus,
       } = userData;
-      console.log('userData', userData)
+      console.log("userData", userData);
 
-      const refAddon = isAddOnAvailable ? userData.refAddon : null;
-      const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
+      // const refAddon = isAddOnAvailable ? userData.refAddon : null;
 
+      //       let refAddon = null;
+      // if (isAddOnAvailable === true) {
+      //   refAddon = userData.refAddon;
+      // }
+
+      // const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
+
+      const refAddOnsId = `{${userData.refAddOnsId.join(",")}}`;
       const refFeaturesId = `{${userData.refFeaturesId.join(",")}}`;
       const refUserGuidelinesId = `{${userData.refUserGuidelinesId.join(",")}}`;
       const refFacilitiesId = `{${userData.refFacilitiesId.join(",")}}`;
@@ -195,6 +204,7 @@ export class groundRepository {
         refGroundId,
         refGroundName,
         isAddOnAvailable,
+        refAddOnsId,
         refFeaturesId,
         refUserGuidelinesId,
         refAdditionalTipsId,
@@ -213,17 +223,17 @@ export class groundRepository {
       ];
       console.log("params", params);
       const Result = await client.query(updateGroundQuery, params);
-      console.log('Result', Result)
+      console.log("Result", Result);
 
-      const result2 = await client.query(updateAddOnsQuery, [
-        refAddOnsId,
-        refAddon,
-        refGroundId,
-        refAddonStatus,
-        CurrentTime(),
-        tokendata.id,
-      ]);
-      console.log('result2', result2)
+      // const result2 = await client.query(updateAddOnsQuery, [
+      //   refAddOnsId,
+      //   refAddon,
+      //   refGroundId,
+      //   refAddonStatus,
+      //   CurrentTime(),
+      //   tokendata.id,
+      // ]);
+      // console.log("result2", result2);
 
       const history = [
         25,
@@ -242,7 +252,7 @@ export class groundRepository {
           message: "Ground updated successfully",
           Result: Result,
           token: tokens,
-          addon: result2,
+          // addon: result2,
         },
         true
       );
@@ -680,7 +690,7 @@ export class groundRepository {
           result: result.rows[0],
           getAddons: getAddons, // Return deleted record for reference
           listOfAddones: addons,
-          imgResult:imgResult
+          imgResult: imgResult,
         },
         true
       );

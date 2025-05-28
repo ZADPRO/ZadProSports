@@ -105,24 +105,26 @@ UPDATE public."refGround"
 SET
   "refGroundName" = $2,
   "isAddOnAvailable" = $3,
-  "refFeaturesId" = $4,
-  "refUserGuidelinesId" = $5,
-  "refAdditionalTipsId" = $6,
-  "refSportsCategoryId" = $7,
-  "refFacilitiesId" = $8,
-  "refGroundPrice" = $9,
-  "refGroundImage" = $10,
-  "refGroundLocation" = $11,
-  "refGroundPincode" = $12,
-  "refGroundState" = $13,
-  "refDescription" = $14,
-  "refStatus" = $15,
-  "IframeLink" = $16,
-  "updatedAt" = $17,
-  "updatedBy" = $18
+  "refAddOnsId" = $4,
+  "refFeaturesId" = $5,
+  "refUserGuidelinesId" = $6,
+  "refAdditionalTipsId" = $7,
+  "refSportsCategoryId" = $8,
+  "refFacilitiesId" = $9,
+  "refGroundPrice" = $10,
+  "refGroundImage" = $11,
+  "refGroundLocation" = $12,
+  "refGroundPincode" = $13,
+  "refGroundState" = $14,
+  "refDescription" = $15,
+  "refStatus" = $16,
+  "IframeLink" = $17,
+  "updatedAt" = $18,
+  "updatedBy" = $19
 WHERE
   "refGroundId" = $1
 RETURNING *;
+
 
 `;
 
