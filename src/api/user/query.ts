@@ -60,6 +60,13 @@ export const insertUnavailableQuery = `
             VALUES ($1, $2, $3, $4, $5)
           `;
 
+
+
+export const getGroundAmtQuery = `
+
+`;
+
+
 export const listFiletedGroundsQuery = `
 SELECT
   rg.*,
@@ -365,7 +372,29 @@ SELECT
           'addOnId', ao."refAddOnsId",
           'addon', ao."refAddOn",
           'selectedDates', COALESCE(json_agg(aa."unAvailabilityDate" ORDER BY aa."unAvailabilityDate"), '[]'::json),
-          'refAddOnsPrice', COALESCE(json_agg(aa."refAddOnsPrice" ORDER BY aa."unAvailabilityDate"), '[]'::json)
+          'refAddOnsPrice', COALESCE(json_agg(aa."refAddOnsPrice" ORDER BY aa."unAvailabilityDate"), '[]'::json),
+          'subAddOns', (
+            SELECT COALESCE(json_agg(jsonb_build_object(
+              'subAddOnId', sa."subAddOnsId",
+              'subAddon', sa."refSubAddOnName",
+              'subAddonPrice', sa."refSubAddOnPrice",
+              'items', (
+                SELECT COALESCE(json_agg(jsonb_build_object(
+                  'itemId', it."refItemsId",
+                  'itemName', it."refItemsName",
+                  'itemPrice', it."refItemsPrice"
+                )), '[]'::json)
+                FROM public."refItems" it
+                WHERE it."subAddOnsId" = sa."subAddOnsId"
+                  AND it."refGroundId" = ub."refGroundId"
+                  AND it."isDelete" IS NOT true
+              )
+            )), '[]'::json)
+            FROM public."subAddOns" sa
+            WHERE sa."refAddOnsId" = ao."refAddOnsId"
+              AND sa."refGroundId" = ub."refGroundId"
+              AND sa."isDelete" IS NOT true
+          )
         ) AS addon_data
       FROM
         public."refAddOns" ao
@@ -400,7 +429,7 @@ GROUP BY
   rg."refGroundState"
 ORDER BY
   ub."refUserBookingId" DESC;
-`;
+  `;
 
 
 export const listUserAuditPageQuery = `
@@ -493,6 +522,35 @@ WHERE
   AND aa."refGroundId" = $1
 `;
 
+// export const listUnavailableAddonsQuery = `
+// SELECT
+//   ao."refAddOnsId",
+//   ao."refAddOn",
+//   aa."addOnsAvailabilityId",
+//   aa."unAvailabilityDate",
+//   array_agg(
+//     json_build_object(
+//       'refAddOnsId',
+//       ao."refAddOnsId",
+//       'refAddOn',
+//       ao."refAddOn",
+//       'unAvailabilityDate',
+//       aa."unAvailabilityDate"
+//     )
+//   ) AS arrayDate
+// FROM
+//   public."addOnUnAvailability" aa
+//   LEFT JOIN public."refAddOns" ao ON CAST(ao."refAddOnsId" AS INTEGER) = aa."refAddOnsId"
+// WHERE
+//   ao."refStatus" IS true
+//   AND ao."isDelete" IS NOT true
+// GROUP BY
+//   ao."refAddOnsId",
+//   ao."refAddOn",
+//   aa."addOnsAvailabilityId",
+//   aa."unAvailabilityDate"
+// `;
+
 export const listUnavailableAddonsQuery = `
 SELECT
   ao."refAddOnsId",
@@ -515,6 +573,8 @@ FROM
 WHERE
   ao."refStatus" IS true
   AND ao."isDelete" IS NOT true
+  AND aa."isDelete" IS NOT true
+  AND aa."refGroundId" = $1
 GROUP BY
   ao."refAddOnsId",
   ao."refAddOn",
@@ -554,4 +614,38 @@ WHERE
   "refGroundId" = $1
 `;
 
+export const listSubAddOnsQuery = `
+SELECT
+  sa.*,
+  ao."refAddOn" 
+FROM
+  public."subAddOns" sa
+  LEFT JOIN public."refAddOns" ao ON CAST (ao."refAddOnsId" AS INTEGER) = sa."refAddOnsId"
+WHERE
+  sa."refStatus" IS true
+  AND sa."isDelete" IS NOT true;
+`;
+export const listItemsQuery = `
+SELECT
+  i.*,
+  ao."refAddOn",
+  sa."refSubAddOnName"
+FROM
+  public."refItems" i
+  LEFT JOIN public."subAddOns" sa ON CAST(sa."subAddOnsId" AS INTEGER) = i."subAddOnsId"
+  LEFT JOIN public."refAddOns" ao ON CAST(ao."refAddOnsId" AS INTEGER) = sa."refAddOnsId"
+WHERE
+  i."refStatus" IS true
+  AND i."isDelete" IS NOT true;
+`;
 
+
+export const getconvertedDataAmountQuery = `
+SELECT
+  *
+FROM
+  public."tempStorage"
+WHERE
+  "tempStorageId" = $1
+  AND "isDelete" IS NOT true
+`;

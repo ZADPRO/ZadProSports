@@ -44,4 +44,10 @@ export class userResolver {
   public async getUnavailableAddonsV1(user_data: any, token_data:any, domain_code: any): Promise<any> {
     return await this.userRepository.getUnavailableAddonsV1(user_data,token_data, domain_code);
   }
+  public async payConvertStringV1(user_data: any, token_data:any, domain_code: any): Promise<any> {
+    return await this.userRepository.payConvertStringV1(user_data,token_data, domain_code);
+  }
+  public async getconvertedDataAmountV1(user_data: any, token_data:any, domain_code: any): Promise<any> {
+    return await this.userRepository.getconvertedDataAmountV1(user_data,token_data, domain_code);
+  }
 }

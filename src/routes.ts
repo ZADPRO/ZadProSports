@@ -4,6 +4,7 @@ import { settingsRoutes } from "./api/settings/routes";
 import { groundRoutes } from "./api/ground/routes";
 import { userRoutes } from "./api/user/routes";
 import { feedbackRoutes } from "./api/feedBack/routes";
+import { ownerRoutes } from "./api/owner/routes";
 
 
 export default class Router {
@@ -13,6 +14,7 @@ export default class Router {
     await new groundRoutes().register(server);
     await new userRoutes().register(server);
     await new feedbackRoutes().register(server);
+    await new ownerRoutes().register(server);
 
   }
 }

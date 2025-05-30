@@ -56,3 +56,17 @@ export function generatePassword(length: number = 8): string {
     .sort(() => 0.5 - Math.random())
     .join("");
 }
+
+
+export const generateDateRange = (start: string, end: string): string[] => {
+  const dateList: string[] = [];
+  const startDate = new Date(start.split("-").reverse().join("-"));
+  const endDate = new Date(end.split("-").reverse().join("-"));
+
+  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    const formatted = d.toISOString().split("T")[0];
+    dateList.push(formatted);
+  }
+
+  return dateList;
+};

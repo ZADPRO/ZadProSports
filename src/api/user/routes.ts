@@ -162,6 +162,28 @@ export class userRoutes implements IRoute {
             auth: false,
           },
         },
+        {
+          method: "POST",
+          path: "/api/v1/userRoutes/payConvertString",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.payConvertString,
+            description: "payConvertString",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
+        {
+          method: "POST",
+          path: "/api/v1/userRoutes/getconvertedDataAmount",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.getconvertedDataAmount,
+            description: "getconvertedDataAmount",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
       ]);
       resolve(true);
     });

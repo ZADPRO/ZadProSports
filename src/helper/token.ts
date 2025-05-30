@@ -29,6 +29,23 @@ function generateTokenWithExpire(
   }
 }
 
+
+const FIVE_MINUTES_EXPIRATION = '5m';
+
+export function generateTokenWith5MExpire(
+  tokenData: object,
+  action: boolean
+): string | object {
+  if (action) {
+    const token = jwt.sign(tokenData, process.env.ACCESS_TOKEN as string, {
+      expiresIn: FIVE_MINUTES_EXPIRATION,
+    });
+    return token;
+  } else {
+    return tokenData;
+  }
+}
+
 // WITHOUT TOKEN EXPIRATION
 function generateTokenWithoutExpire(
   tokenData: object,

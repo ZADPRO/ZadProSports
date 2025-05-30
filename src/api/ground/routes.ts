@@ -134,7 +134,7 @@ export class groundRoutes implements IRoute {
           config: {
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.addAddons,
-            validate: validate.addAddons,
+            // validate: validate.addAddons,
             description: "addAddons",
             tags: ["api", "Users"],
             auth: false,
@@ -146,7 +146,7 @@ export class groundRoutes implements IRoute {
           config: {
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.updateAddons,
-            validate: validate.updateAddons,
+            // validate: validate.updateAddons,
             description: "updateAddons",
             tags: ["api", "Users"],
             auth: false,

@@ -40,20 +40,144 @@ import {
 import { CurrentTime } from "../../helper/common";
 
 export class groundRepository {
+  // public async addGroundV1(userData: any, tokendata: any): Promise<any> {
+  //   console.log("userData", userData);
+  //   const client: PoolClient = await getClient();
+  //   const token = { id: tokendata.id };
+  //   const tokens = generateTokenWithExpire(token, true);
+  //   try {
+  //     await client.query("BEGIN");
+
+  //     const {
+  //       refGroundName,
+  //       isAddOnAvailable,
+  //       // refAddon,
+  //       // refAddonStatus,
+  //       IframeLink,
+  //       refGroundPrice,
+  //       refGroundImage,
+  //       refGroundLocation,
+  //       refGroundPincode,
+  //       refGroundState,
+  //       refDescription,
+  //       refStatus,
+  //     } = userData;
+
+  //     // const refAddon = isAddOnAvailable ? userData.refAddon : null;
+  //     // const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
+
+  //     const refAddOnsId = `{${userData.refAddOnsId.join(",")}}`;
+  //     const refFeaturesId = `{${userData.refFeaturesId.join(",")}}`;
+  //     const refUserGuidelinesId = `{${userData.refUserGuidelinesId.join(",")}}`;
+  //     const refFacilitiesId = `{${userData.refFacilitiesId.join(",")}}`;
+  //     const refAdditionalTipsId = `{${userData.refAdditionalTipsId.join(",")}}`;
+  //     const refSportsCategoryId = `{${userData.refSportsCategoryId.join(",")}}`;
+
+  //     const customerPrefix = "CGA-GRD-";
+  //     const baseNumber = 0;
+
+  //     const lastCustomerResult = await client.query(getLastGroundIdQuery);
+  //     let newCustomerId: string;
+
+  //     if (lastCustomerResult.rows.length > 0) {
+  //       const lastNumber = parseInt(lastCustomerResult.rows[0].count, 10);
+  //       newCustomerId = `${customerPrefix}${(baseNumber + lastNumber + 1)
+  //         .toString()
+  //         .padStart(4, "0")}`;
+  //     } else {
+  //       newCustomerId = `${customerPrefix}${(baseNumber + 1)
+  //         .toString()
+  //         .padStart(4, "0")}`;
+  //     }
+
+  //     const params = [
+  //       refGroundName,
+  //       newCustomerId,
+  //       isAddOnAvailable,
+  //       refAddOnsId,
+  //       refFeaturesId,
+  //       refUserGuidelinesId,
+  //       refAdditionalTipsId,
+  //       refSportsCategoryId,
+  //       refFacilitiesId,
+  //       refGroundPrice,
+  //       refGroundImage,
+  //       refGroundLocation,
+  //       refGroundPincode,
+  //       refGroundState,
+  //       refDescription,
+  //       refStatus,
+  //       IframeLink,
+  //       CurrentTime(),
+  //       tokendata.id,
+  //     ];
+  //     console.log("params", params);
+  //     const Result = await client.query(addGroundQuery, params);
+  //     //   console.log("userResult", userResult);
+  //     const getgroundId = Result.rows[0];
+
+  //     // const result = await client.query(addAddOnsQuery, [
+  //     //   refAddon,
+  //     //   getgroundId.refGroundId,
+  //     //   refAddonStatus,
+  //     // ]);
+
+  //     const history = [
+  //       24,
+  //       tokendata.id,
+  //       `${refGroundName} Ground Added successfully`,
+  //       CurrentTime(),
+  //       tokendata.id,
+  //     ];
+
+  //     const updateHistory = await client.query(updateHistoryQuery, history);
+  //     await client.query("COMMIT");
+
+  //     return encrypt(
+  //       {
+  //         success: true,
+  //         message: "Ground added successfully",
+  //         Result: Result,
+  //         token: tokens,
+  //       },
+  //       true
+  //     );
+  //   } catch (error: unknown) {
+  //     console.log("error", error);
+  //     await client.query("ROLLBACK");
+
+  //     return encrypt(
+  //       {
+  //         success: false,
+  //         message: "An unknown error occurred during Ground addition",
+  //         token: tokens,
+  //         error: String(error),
+  //       },
+  //       true
+  //     );
+  //   } finally {
+  //     client.release();
+  //   }
+  // }
+
   public async addGroundV1(userData: any, tokendata: any): Promise<any> {
     console.log("userData", userData);
     const client: PoolClient = await getClient();
     const token = { id: tokendata.id };
     const tokens = generateTokenWithExpire(token, true);
+
     try {
       await client.query("BEGIN");
 
       const {
         refGroundName,
         isAddOnAvailable,
-        // refAddon,
-        // refAddonStatus,
-        IframeLink,
+        refAddOns,
+        refFeaturesId,
+        refUserGuidelinesId,
+        refFacilitiesId,
+        refAdditionalTipsId,
+        refSportsCategoryId,
         refGroundPrice,
         refGroundImage,
         refGroundLocation,
@@ -61,45 +185,36 @@ export class groundRepository {
         refGroundState,
         refDescription,
         refStatus,
+        IframeLink,
       } = userData;
 
-      // const refAddon = isAddOnAvailable ? userData.refAddon : null;
-      // const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
+      // Prepare array strings for Postgres arrays
+      const refFeatures = `{${refFeaturesId.join(",")}}`;
+      const refUserGuidelines = `{${refUserGuidelinesId.join(",")}}`;
+      const refFacilities = `{${refFacilitiesId.join(",")}}`;
+      const refTips = `{${refAdditionalTipsId.join(",")}}`;
+      const refSports = `{${refSportsCategoryId.join(",")}}`;
 
-      const refAddOnsId = `{${userData.refAddOnsId.join(",")}}`;
-      const refFeaturesId = `{${userData.refFeaturesId.join(",")}}`;
-      const refUserGuidelinesId = `{${userData.refUserGuidelinesId.join(",")}}`;
-      const refFacilitiesId = `{${userData.refFacilitiesId.join(",")}}`;
-      const refAdditionalTipsId = `{${userData.refAdditionalTipsId.join(",")}}`;
-      const refSportsCategoryId = `{${userData.refSportsCategoryId.join(",")}}`;
+      // Get last ground count for new ID generation
+      const lastGroundResult = await client.query(getLastGroundIdQuery);
+      const lastNumber =
+        lastGroundResult.rows.length > 0
+          ? parseInt(lastGroundResult.rows[0].count, 10)
+          : 0;
+      const newCustomerId = `CGA-GRD-${(lastNumber + 1)
+        .toString()
+        .padStart(4, "0")}`;
 
-      const customerPrefix = "CGA-GRD-";
-      const baseNumber = 0;
-
-      const lastCustomerResult = await client.query(getLastGroundIdQuery);
-      let newCustomerId: string;
-
-      if (lastCustomerResult.rows.length > 0) {
-        const lastNumber = parseInt(lastCustomerResult.rows[0].count, 10);
-        newCustomerId = `${customerPrefix}${(baseNumber + lastNumber + 1)
-          .toString()
-          .padStart(4, "0")}`;
-      } else {
-        newCustomerId = `${customerPrefix}${(baseNumber + 1)
-          .toString()
-          .padStart(4, "0")}`;
-      }
-
-      const params = [
+      // Insert ground data
+      const groundInsertParams = [
         refGroundName,
         newCustomerId,
         isAddOnAvailable,
-        refAddOnsId,
-        refFeaturesId,
-        refUserGuidelinesId,
-        refAdditionalTipsId,
-        refSportsCategoryId,
-        refFacilitiesId,
+        refFeatures,
+        refUserGuidelines,
+        refTips,
+        refSports,
+        refFacilities,
         refGroundPrice,
         refGroundImage,
         refGroundLocation,
@@ -111,17 +226,111 @@ export class groundRepository {
         CurrentTime(),
         tokendata.id,
       ];
-      console.log("params", params);
-      const Result = await client.query(addGroundQuery, params);
-      //   console.log("userResult", userResult);
-      const getgroundId = Result.rows[0];
 
-      // const result = await client.query(addAddOnsQuery, [
-      //   refAddon,
-      //   getgroundId.refGroundId,
-      //   refAddonStatus,
-      // ]);
+      const groundResult = await client.query(
+        addGroundQuery,
+        groundInsertParams
+      );
+      const groundId = groundResult.rows[0].refGroundId;
+      console.log("groundId", groundId);
 
+      // Maps to hold inserted IDs by name for referencing in sub records
+      const refAddOnsIdMap = new Map<string, number>();
+      const refSubAddOnsIdMap = new Map<string, number>();
+
+      // Insert AddOns with their nested SubAddOns and Items
+      if (isAddOnAvailable && refAddOns?.length) {
+        for (const addon of refAddOns) {
+          // Insert AddOn
+          const addonRes = await client.query(
+            `
+          INSERT INTO "refAddOns" (
+            "refAddOn",
+            "refAddonPrice",
+            "refGroundId",
+            "createdAt",
+            "createdBy",
+            "refStatus"
+          )
+          VALUES ($1, $2, $3, $4, $5, $6)
+          RETURNING "refAddOnsId";
+          `,
+            [
+              addon.name,
+              addon.price,
+              groundId,
+              CurrentTime(),
+              tokendata.id,
+              true,
+            ]
+          );
+          const addOnId = addonRes.rows[0].refAddOnsId;
+          refAddOnsIdMap.set(addon.name, addOnId);
+
+          // Insert SubAddOns if available
+          if (addon.isSubaddonsAvailable && addon.refSubAddOns?.length) {
+            for (const subAddon of addon.refSubAddOns) {
+              const subRes = await client.query(
+                `
+              INSERT INTO "subAddOns" (
+                "refAddOnsId",
+                "refSubAddOnName",
+                "refSubAddOnPrice",
+                "refGroundId",
+                "createdAt",
+                "createdBy",
+                "refStatus"
+              )
+              VALUES ($1, $2, $3, $4, $5, $6, $7)
+              RETURNING "subAddOnsId";
+              `,
+                [
+                  addOnId,
+                  subAddon.name,
+                  subAddon.price,
+                  groundId,
+                  CurrentTime(),
+                  tokendata.id,
+                  true,
+                ]
+              );
+              const subAddOnId = subRes.rows[0].subAddOnsId;
+              refSubAddOnsIdMap.set(subAddon.name, subAddOnId);
+
+              // Insert Items if available
+              if (subAddon.isItemsAvailable && subAddon.refItems?.length) {
+                for (const item of subAddon.refItems) {
+                  await client.query(
+                    `
+                  INSERT INTO "refItems" (
+                    "subAddOnsId",
+                    "refItemsName",
+                    "refItemsPrice",
+                    "refGroundId",
+                    "createdAt",
+                    "createdBy",
+                    "refStatus"
+                  )
+                  VALUES ($1, $2, $3, $4, $5, $6, $7)
+                  `,
+                    [
+                      subAddOnId,
+                      item.name,
+                      item.price,
+                      groundId,
+                      CurrentTime(),
+                      tokendata.id,
+                      true,
+                    ]
+                  );
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Add to history
       const history = [
         24,
         tokendata.id,
@@ -129,29 +338,28 @@ export class groundRepository {
         CurrentTime(),
         tokendata.id,
       ];
+      await client.query(updateHistoryQuery, history);
 
-      const updateHistory = await client.query(updateHistoryQuery, history);
       await client.query("COMMIT");
 
       return encrypt(
         {
           success: true,
           message: "Ground added successfully",
-          Result: Result,
+          groundId,
           token: tokens,
         },
         true
       );
-    } catch (error: unknown) {
+    } catch (error) {
       console.log("error", error);
       await client.query("ROLLBACK");
-
       return encrypt(
         {
           success: false,
-          message: "An unknown error occurred during Ground addition",
-          token: tokens,
+          message: "An error occurred while adding ground",
           error: String(error),
+          token: tokens,
         },
         true
       );
@@ -159,57 +367,139 @@ export class groundRepository {
       client.release();
     }
   }
+
+  // public async updateGroundV1(userData: any, tokendata: any): Promise<any> {
+  //   console.log("userData", userData);
+  //   const client: PoolClient = await getClient();
+  //   const token = { id: tokendata.id };
+  //   const tokens = generateTokenWithExpire(token, true);
+  //   try {
+  //     await client.query("BEGIN");
+  //     const {
+  //       refGroundId,
+  //       refGroundName,
+  //       isAddOnAvailable,
+  //       // refAddOnsId,
+  //       // refAddon,
+  //       // refAddonStatus,
+  //       IframeLink,
+  //       refGroundPrice,
+  //       refGroundImage,
+  //       refGroundLocation,
+  //       refGroundPincode,
+  //       refGroundState,
+  //       refDescription,
+  //       refStatus,
+  //     } = userData;
+  //     console.log("userData", userData);
+
+  //     // const refAddon = isAddOnAvailable ? userData.refAddon : null;
+
+  //     //       let refAddon = null;
+  //     // if (isAddOnAvailable === true) {
+  //     //   refAddon = userData.refAddon;
+  //     // }
+
+  //     // const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
+
+  //     const refAddOnsId = `{${userData.refAddOnsId.join(",")}}`;
+  //     const refFeaturesId = `{${userData.refFeaturesId.join(",")}}`;
+  //     const refUserGuidelinesId = `{${userData.refUserGuidelinesId.join(",")}}`;
+  //     const refFacilitiesId = `{${userData.refFacilitiesId.join(",")}}`;
+  //     const refAdditionalTipsId = `{${userData.refAdditionalTipsId.join(",")}}`;
+  //     const refSportsCategoryId = `{${userData.refSportsCategoryId.join(",")}}`;
+
+  //     const params = [
+  //       refGroundId,
+  //       refGroundName,
+  //       isAddOnAvailable,
+  //       refAddOnsId,
+  //       refFeaturesId,
+  //       refUserGuidelinesId,
+  //       refAdditionalTipsId,
+  //       refSportsCategoryId,
+  //       refFacilitiesId,
+  //       refGroundPrice,
+  //       refGroundImage,
+  //       refGroundLocation,
+  //       refGroundPincode,
+  //       refGroundState,
+  //       refDescription,
+  //       refStatus,
+  //       IframeLink,
+  //       CurrentTime(),
+  //       tokendata.id,
+  //     ];
+  //     console.log("params", params);
+  //     const Result = await client.query(updateGroundQuery, params);
+  //     console.log("Result", Result);
+
+  //     // const result2 = await client.query(updateAddOnsQuery, [
+  //     //   refAddOnsId,
+  //     //   refAddon,
+  //     //   refGroundId,
+  //     //   refAddonStatus,
+  //     //   CurrentTime(),
+  //     //   tokendata.id,
+  //     // ]);
+  //     // console.log("result2", result2);
+
+  //     const history = [
+  //       25,
+  //       tokendata.id,
+  //       `${refGroundName} Ground updated successfully`,
+  //       CurrentTime(),
+  //       tokendata.id,
+  //     ];
+
+  //     const updateHistory = await client.query(updateHistoryQuery, history);
+  //     await client.query("COMMIT");
+
+  //     return encrypt(
+  //       {
+  //         success: true,
+  //         message: "Ground updated successfully",
+  //         Result: Result,
+  //         token: tokens,
+  //         // addon: result2,
+  //       },
+  //       true
+  //     );
+  //   } catch (error: unknown) {
+  //     console.log("error", error);
+  //     await client.query("ROLLBACK");
+
+  //     return encrypt(
+  //       {
+  //         success: false,
+  //         message: "An unknown error occurred during Ground update",
+  //         token: tokens,
+  //         error: String(error),
+  //       },
+  //       true
+  //     );
+  //   } finally {
+  //     client.release();
+  //   }
+  // }
   public async updateGroundV1(userData: any, tokendata: any): Promise<any> {
-    console.log("userData", userData);
     const client: PoolClient = await getClient();
     const token = { id: tokendata.id };
     const tokens = generateTokenWithExpire(token, true);
+
     try {
       await client.query("BEGIN");
+
       const {
         refGroundId,
         refGroundName,
         isAddOnAvailable,
-        // refAddOnsId,
-        // refAddon,
-        // refAddonStatus,
-        IframeLink,
-        refGroundPrice,
-        refGroundImage,
-        refGroundLocation,
-        refGroundPincode,
-        refGroundState,
-        refDescription,
-        refStatus,
-      } = userData;
-      console.log("userData", userData);
-
-      // const refAddon = isAddOnAvailable ? userData.refAddon : null;
-
-      //       let refAddon = null;
-      // if (isAddOnAvailable === true) {
-      //   refAddon = userData.refAddon;
-      // }
-
-      // const refAddonStatus = isAddOnAvailable ? userData.refAddonStatus : null;
-
-      const refAddOnsId = `{${userData.refAddOnsId.join(",")}}`;
-      const refFeaturesId = `{${userData.refFeaturesId.join(",")}}`;
-      const refUserGuidelinesId = `{${userData.refUserGuidelinesId.join(",")}}`;
-      const refFacilitiesId = `{${userData.refFacilitiesId.join(",")}}`;
-      const refAdditionalTipsId = `{${userData.refAdditionalTipsId.join(",")}}`;
-      const refSportsCategoryId = `{${userData.refSportsCategoryId.join(",")}}`;
-
-      const params = [
-        refGroundId,
-        refGroundName,
-        isAddOnAvailable,
-        refAddOnsId,
+        refAddOns,
         refFeaturesId,
         refUserGuidelinesId,
+        refFacilitiesId,
         refAdditionalTipsId,
         refSportsCategoryId,
-        refFacilitiesId,
         refGroundPrice,
         refGroundImage,
         refGroundLocation,
@@ -218,54 +508,264 @@ export class groundRepository {
         refDescription,
         refStatus,
         IframeLink,
-        CurrentTime(),
-        tokendata.id,
-      ];
-      console.log("params", params);
-      const Result = await client.query(updateGroundQuery, params);
-      console.log("Result", Result);
+      } = userData;
 
-      // const result2 = await client.query(updateAddOnsQuery, [
-      //   refAddOnsId,
-      //   refAddon,
-      //   refGroundId,
-      //   refAddonStatus,
-      //   CurrentTime(),
-      //   tokendata.id,
-      // ]);
-      // console.log("result2", result2);
+      // Prepare array strings for Postgres arrays
+      const refFeatures = `{${refFeaturesId.join(",")}}`;
+      const refUserGuidelines = `{${refUserGuidelinesId.join(",")}}`;
+      const refFacilities = `{${refFacilitiesId.join(",")}}`;
+      const refTips = `{${refAdditionalTipsId.join(",")}}`;
+      const refSports = `{${refSportsCategoryId.join(",")}}`;
 
+      // Update ground main record
+      await client.query(
+        `
+      UPDATE "refGround"
+      SET 
+        "refGroundName" = $1,
+        "isAddOnAvailable" = $2,
+        "refFeaturesId" = $3,
+        "refUserGuidelinesId" = $4,
+        "refAdditionalTipsId" = $5,
+        "refSportsCategoryId" = $6,
+        "refFacilitiesId" = $7,
+        "refGroundPrice" = $8,
+        "refGroundImage" = $9,
+        "refGroundLocation" = $10,
+        "refGroundPincode" = $11,
+        "refGroundState" = $12,
+        "refDescription" = $13,
+        "refStatus" = $14,
+        "IframeLink" = $15,
+        "updatedAt" = $16,
+        "updatedBy" = $17
+      WHERE "refGroundId" = $18
+    `,
+        [
+          refGroundName,
+          isAddOnAvailable,
+          refFeatures,
+          refUserGuidelines,
+          refTips,
+          refSports,
+          refFacilities,
+          refGroundPrice,
+          refGroundImage,
+          refGroundLocation,
+          refGroundPincode,
+          refGroundState,
+          refDescription,
+          refStatus,
+          IframeLink,
+          CurrentTime(),
+          tokendata.id,
+          refGroundId,
+        ]
+      );
+
+      // Maps to keep track of updated or inserted IDs
+      const refAddOnsIdMap = new Map<string, number>();
+      const refSubAddOnsIdMap = new Map<string, number>();
+
+      // Process AddOns
+      if (isAddOnAvailable && refAddOns?.length) {
+        for (const addon of refAddOns) {
+          if (addon.refAddOnsId) {
+            // Update existing AddOn
+            await client.query(
+              `
+            UPDATE "refAddOns"
+            SET
+              "refAddOn" = $1,
+              "refAddonPrice" = $2,
+              "updatedAt" = $3,
+              "updatedBy" = $4,
+              "refStatus" = true
+            WHERE "refAddOnsId" = $5
+          `,
+              [
+                addon.name,
+                addon.price,
+                CurrentTime(),
+                tokendata.id,
+                addon.refAddOnsId,
+              ]
+            );
+            refAddOnsIdMap.set(addon.name, addon.refAddOnsId);
+          } else {
+            // Insert new AddOn
+            const res = await client.query(
+              `
+            INSERT INTO "refAddOns" (
+              "refAddOn", "refAddonPrice", "refGroundId", "createdAt", "createdBy", "refStatus"
+            )
+            VALUES ($1, $2, $3, $4, $5, true)
+            RETURNING "refAddOnsId"
+          `,
+              [
+                addon.name,
+                addon.price,
+                refGroundId,
+                CurrentTime(),
+                tokendata.id,
+              ]
+            );
+            const newId = res.rows[0].refAddOnsId;
+            refAddOnsIdMap.set(addon.name, newId);
+          }
+
+          // Process SubAddOns for this AddOn
+          if (addon.isSubaddonsAvailable && addon.refSubAddOns?.length) {
+            for (const sub of addon.refSubAddOns) {
+              const parentAddOnId =
+                addon.refAddOnsId || refAddOnsIdMap.get(addon.name);
+              if (!parentAddOnId) {
+                throw new Error(
+                  `Parent AddOn ID not found for SubAddOn: ${sub.name}`
+                );
+              }
+
+              if (sub.refSubAddOnsId) {
+                // Update existing SubAddOn
+                await client.query(
+                  `
+                UPDATE "subAddOns"
+                SET
+                  "refAddOnsId" = $1,
+                  "refSubAddOnName" = $2,
+                  "refSubAddOnPrice" = $3,
+                  "updatedAt" = $4,
+                  "updatedBy" = $5,
+                  "refStatus" = true
+                WHERE "subAddOnsId" = $6
+              `,
+                  [
+                    parentAddOnId,
+                    sub.name,
+                    sub.price,
+                    CurrentTime(),
+                    tokendata.id,
+                    sub.refSubAddOnsId,
+                  ]
+                );
+                refSubAddOnsIdMap.set(sub.name, sub.refSubAddOnsId);
+              } else {
+                // Insert new SubAddOn
+                const res = await client.query(
+                  `
+                INSERT INTO "subAddOns" (
+                  "refAddOnsId", "refSubAddOnName", "refSubAddOnPrice",
+                  "refGroundId", "createdAt", "createdBy", "refStatus"
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, true)
+                RETURNING "subAddOnsId"
+              `,
+                  [
+                    parentAddOnId,
+                    sub.name,
+                    sub.price,
+                    refGroundId,
+                    CurrentTime(),
+                    tokendata.id,
+                  ]
+                );
+                const newSubId = res.rows[0].subAddOnsId;
+                refSubAddOnsIdMap.set(sub.name, newSubId);
+              }
+
+              // Process Items for this SubAddOn
+              if (sub.isItemsAvailable && sub.refItems?.length) {
+                for (const item of sub.refItems) {
+                  const parentSubAddOnId =
+                    sub.refSubAddOnsId || refSubAddOnsIdMap.get(sub.name);
+                  if (!parentSubAddOnId) {
+                    throw new Error(
+                      `Parent SubAddOn ID not found for Item: ${item.name}`
+                    );
+                  }
+
+                  if (item.refItemsId) {
+                    // Update existing Item
+                    await client.query(
+                      `
+                    UPDATE "refItems"
+                    SET
+                      "subAddOnsId" = $1,
+                      "refItemsName" = $2,
+                      "refItemsPrice" = $3,
+                      "updatedAt" = $4,
+                      "updatedBy" = $5,
+                      "refStatus" = true
+                    WHERE "refItemsId" = $6
+                  `,
+                      [
+                        parentSubAddOnId,
+                        item.name,
+                        item.price,
+                        CurrentTime(),
+                        tokendata.id,
+                        item.refItemsId,
+                      ]
+                    );
+                  } else {
+                    // Insert new Item
+                    await client.query(
+                      `
+                    INSERT INTO "refItems" (
+                      "subAddOnsId", "refItemsName", "refItemsPrice",
+                      "refGroundId", "createdAt", "createdBy", "refStatus"
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6, true)
+                  `,
+                      [
+                        parentSubAddOnId,
+                        item.name,
+                        item.price,
+                        refGroundId,
+                        CurrentTime(),
+                        tokendata.id,
+                      ]
+                    );
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Optional: You may want to handle deletion of removed AddOns/SubAddOns/Items here
+      // (e.g., mark as inactive or delete based on business rules)
+
+      // Add to history
       const history = [
-        25,
+        24,
         tokendata.id,
         `${refGroundName} Ground updated successfully`,
         CurrentTime(),
         tokendata.id,
       ];
+      await client.query(updateHistoryQuery, history);
 
-      const updateHistory = await client.query(updateHistoryQuery, history);
       await client.query("COMMIT");
 
       return encrypt(
         {
           success: true,
           message: "Ground updated successfully",
-          Result: Result,
+          groundId: refGroundId,
           token: tokens,
-          // addon: result2,
         },
         true
       );
-    } catch (error: unknown) {
-      console.log("error", error);
+    } catch (error) {
       await client.query("ROLLBACK");
-
       return encrypt(
         {
           success: false,
-          message: "An unknown error occurred during Ground update",
-          token: tokens,
+          message: "An error occurred while updating ground",
           error: String(error),
+          token: tokens,
         },
         true
       );
@@ -273,6 +773,7 @@ export class groundRepository {
       client.release();
     }
   }
+
   public async uploadRoomImageV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id };
     const tokens = generateTokenWithExpire(token, true);
@@ -516,8 +1017,8 @@ export class groundRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listGroundQuery);
-      const addons = await executeQuery(listaddonsQuery);
+      const result = await executeQuery(listGroundQuery, [tokendata.id]);
+      const addons = await executeQuery(listaddonsQuery,[tokendata.id]);
 
       // for (const product of result) {
       //   if (product.refGroundImage) {
@@ -720,11 +1221,14 @@ export class groundRepository {
     try {
       await client.query("BEGIN"); // Start transaction
 
-      const { addOns, refGroundId, refStatus } = userData;
+      const { addOns, refGroundId, refStatus, refPrice } = userData;
       const result = await client.query(addAddOnsQuery, [
         addOns,
+        refPrice,
         refGroundId,
         refStatus,
+        CurrentTime(),
+        tokendata.id,
       ]);
 
       const history = [
