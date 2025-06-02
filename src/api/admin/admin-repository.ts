@@ -21,6 +21,7 @@ import {
   getLastCustomerIdQuery,
   insertUserDomainQuery,
   insertUserQuery,
+  listdashboardQuery,
   listOverallAuditQuery,
   listReportQuery,
   listSignUpUserQuery,
@@ -266,6 +267,36 @@ export class adminRepository {
       client.release();
     }
   }
+  // public async listUserBookingsV1(userData: any, tokendata: any): Promise<any> {
+  //   const token = { id: tokendata.id };
+  //   const tokens = generateTokenWithExpire(token, true);
+
+  //   try {
+  //     const result = await executeQuery(listUserBookingsQuery);
+
+  //     return encrypt(
+  //       {
+  //         success: true,
+  //         message: "ground booking listed successfully",
+  //         token: tokens,
+  //         result: result, // Return deleted record for reference
+  //       },
+  //       true
+  //     );
+  //   } catch (error: unknown) {
+  //     console.error("Error list ground", error);
+
+  //     return encrypt(
+  //       {
+  //         success: false,
+  //         message: "An error occurred while list ground booking",
+  //         token: tokens,
+  //         error: String(error),
+  //       },
+  //       true
+  //     );
+  //   }
+  // }
   public async listUserBookingsV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id };
     const tokens = generateTokenWithExpire(token, true);
@@ -273,12 +304,25 @@ export class adminRepository {
     try {
       const result = await executeQuery(listUserBookingsQuery);
 
+      const parsedPayloadArray = [];
+
+      for (const record of result) {
+        try {
+          const parsed = JSON.parse(record.payload);
+          record.payload = parsed; // Replace string with parsed object
+          parsedPayloadArray.push(parsed);
+        } catch (err) {
+          console.warn("Invalid JSON in payload field for record:", record);
+          record.payload = null; // Optional: mark as null or handle differently
+        }
+      }
       return encrypt(
         {
           success: true,
           message: "ground booking listed successfully",
           token: tokens,
           result: result, // Return deleted record for reference
+          parsedPayloadArray: parsedPayloadArray,
         },
         true
       );
@@ -442,7 +486,37 @@ export class adminRepository {
       return encrypt(
         {
           success: false,
-          message: "An error occurred while list over all audit",
+          message: "An error occurred while list over all Report",
+          token: tokens,
+          error: String(error),
+        },
+        true
+      );
+    }
+  }
+  public async dashboardV1(userData: any, tokendata: any): Promise<any> {
+    const token = { id: tokendata.id };
+    const tokens = generateTokenWithExpire(token, true);
+
+    try {
+      const result = await executeQuery(listdashboardQuery);
+
+      return encrypt(
+        {
+          success: true,
+          message: "list dashboard listed successfully",
+          token: tokens,
+          result: result, // Return deleted record for reference
+        },
+        true
+      );
+    } catch (error: unknown) {
+      console.error("Error list list dashboardV1", error);
+
+      return encrypt(
+        {
+          success: false,
+          message: "An error occurred while list dashboardV1",
           token: tokens,
           error: String(error),
         },

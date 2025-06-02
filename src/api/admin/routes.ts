@@ -85,8 +85,18 @@ export class adminRoutes implements IRoute {
           config: {
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.reportPage,
-            // validate: validate.listUserBookings,
             description: "reportPage",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
+         {
+          method: "GET",
+          path: "/api/v1/adminRoutes/dashboard",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.dashboard,
+            description: "dashboard",
             tags: ["api", "Users"],
             auth: false,
           },

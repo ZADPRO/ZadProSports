@@ -97,84 +97,112 @@ RETURNING
 export const listUserBookingsQuery = `
 SELECT
   ub.*,
+  ts.payload,
+  ts."bookingAmount",
+  ts."addonsAmount",
+  ts."resSGSTAmount",
+  ts."refCGSTAmount",
+  ts."totalAmount",
   rg."refGroundName",
   rg."refGroundCustId",
-  rg."isAddOnAvailable",
-  rg."refGroundPrice",
-  rg."refGroundLocation",
-  rg."refGroundPincode",
-  rg."refGroundState",
-  (
-    SELECT
-      COALESCE(
-        json_agg(addon_data) FILTER (
-          WHERE jsonb_array_length(addon_data -> 'selectedDates') > 0
-        ),
-        '[]'::json
-      )
-    FROM (
-      SELECT
-        jsonb_build_object(
-          'addOnId', ao."refAddOnsId",
-          'addon', ao."refAddOn",
-          'selectedDates', COALESCE(json_agg(aa."unAvailabilityDate" ORDER BY aa."unAvailabilityDate"), '[]'::json),
-          'refAddOnsPrice', COALESCE(json_agg(aa."refAddOnsPrice" ORDER BY aa."unAvailabilityDate"), '[]'::json),
-          'subAddOns', (
-            SELECT COALESCE(json_agg(jsonb_build_object(
-              'subAddOnId', sa."subAddOnsId",
-              'subAddon', sa."refSubAddOnName",
-              'subAddonPrice', sa."refSubAddOnPrice",
-              'items', (
-                SELECT COALESCE(json_agg(jsonb_build_object(
-                  'itemId', it."refItemsId",
-                  'itemName', it."refItemsName",
-                  'itemPrice', it."refItemsPrice"
-                )), '[]'::json)
-                FROM public."refItems" it
-                WHERE it."subAddOnsId" = sa."subAddOnsId"
-                  AND it."refGroundId" = ub."refGroundId"
-                  AND it."isDelete" IS NOT true
-              )
-            )), '[]'::json)
-            FROM public."subAddOns" sa
-            WHERE sa."refAddOnsId" = ao."refAddOnsId"
-              AND sa."refGroundId" = ub."refGroundId"
-              AND sa."isDelete" IS NOT true
-          )
-        ) AS addon_data
-      FROM
-        public."refAddOns" ao
-        LEFT JOIN public."addOnUnAvailability" aa
-          ON aa."refAddOnsId" = ao."refAddOnsId"
-          AND aa."refGroundId" = ub."refGroundId"
-          AND aa."isDelete" IS NOT true
-          AND aa."createdAt" = ub."createdAt"
-      WHERE
-        ao."refAddOnsId" = ANY (
-          string_to_array(regexp_replace(ub."refAddOnsId", '[{}]', '', 'g'), ',')::INTEGER[]
-        )
-        AND ao."refStatus" IS true
-      GROUP BY
-        ao."refAddOnsId", ao."refAddOn"
-    ) AS addon_subquery
-  ) AS "AddOn"
+  u."refCustId",
+  u."refUserFname",
+  u."refUserLname",
+  ud."refMobileNumber",
+  ud."refEmail"
 FROM
   public."refUserBooking" ub
+  LEFT JOIN public."tempStorage" ts ON CAST(ts."tempStorageId" AS INTEGER) = ub."tempStorageId"
   LEFT JOIN public."refGround" rg ON CAST(rg."refGroundId" AS INTEGER) = ub."refGroundId"
+  LEFT JOIN public."users" u ON CAST(u."refuserId" AS INTEGER) = ub."refUserId"
+  LEFT JOIN public."refUsersDomain" ud ON CAST(ud."refUserId" AS INTEGER) = ub."refUserId"
 WHERE
-ub."isDelete" IS NOT true
-GROUP BY
-  ub."refUserBookingId",
-  rg."refGroundName",
-  rg."refGroundCustId",
-  rg."isAddOnAvailable",
-  rg."refGroundPrice",
-  rg."refGroundLocation",
-  rg."refGroundPincode",
-  rg."refGroundState"
-ORDER BY
+  ub."isDelete" IS NOT true
+    ORDER BY
   ub."refUserBookingId" DESC;
 `;
+
+// export const listUserBookingsQuery = `
+// SELECT
+//   ub.*,
+//   rg."refGroundName",
+//   rg."refGroundCustId",
+//   rg."isAddOnAvailable",
+//   rg."refGroundPrice",
+//   rg."refGroundLocation",
+//   rg."refGroundPincode",
+//   rg."refGroundState",
+//   (
+//     SELECT
+//       COALESCE(
+//         json_agg(addon_data) FILTER (
+//           WHERE jsonb_array_length(addon_data -> 'selectedDates') > 0
+//         ),
+//         '[]'::json
+//       )
+//     FROM (
+//       SELECT
+//         jsonb_build_object(
+//           'addOnId', ao."refAddOnsId",
+//           'addon', ao."refAddOn",
+//           'selectedDates', COALESCE(json_agg(aa."unAvailabilityDate" ORDER BY aa."unAvailabilityDate"), '[]'::json),
+//           'refAddOnsPrice', COALESCE(json_agg(aa."refAddOnsPrice" ORDER BY aa."unAvailabilityDate"), '[]'::json),
+//           'subAddOns', (
+//             SELECT COALESCE(json_agg(jsonb_build_object(
+//               'subAddOnId', sa."subAddOnsId",
+//               'subAddon', sa."refSubAddOnName",
+//               'subAddonPrice', sa."refSubAddOnPrice",
+//               'items', (
+//                 SELECT COALESCE(json_agg(jsonb_build_object(
+//                   'itemId', it."refItemsId",
+//                   'itemName', it."refItemsName",
+//                   'itemPrice', it."refItemsPrice"
+//                 )), '[]'::json)
+//                 FROM public."refItems" it
+//                 WHERE it."subAddOnsId" = sa."subAddOnsId"
+//                   AND it."refGroundId" = ub."refGroundId"
+//                   AND it."isDelete" IS NOT true
+//               )
+//             )), '[]'::json)
+//             FROM public."subAddOns" sa
+//             WHERE sa."refAddOnsId" = ao."refAddOnsId"
+//               AND sa."refGroundId" = ub."refGroundId"
+//               AND sa."isDelete" IS NOT true
+//           )
+//         ) AS addon_data
+//       FROM
+//         public."refAddOns" ao
+//         LEFT JOIN public."addOnUnAvailability" aa
+//           ON aa."refAddOnsId" = ao."refAddOnsId"
+//           AND aa."refGroundId" = ub."refGroundId"
+//           AND aa."isDelete" IS NOT true
+//           AND aa."createdAt" = ub."createdAt"
+//       WHERE
+//         ao."refAddOnsId" = ANY (
+//           string_to_array(regexp_replace(ub."refAddOnsId", '[{}]', '', 'g'), ',')::INTEGER[]
+//         )
+//         AND ao."refStatus" IS true
+//       GROUP BY
+//         ao."refAddOnsId", ao."refAddOn"
+//     ) AS addon_subquery
+//   ) AS "AddOn"
+// FROM
+//   public."refUserBooking" ub
+//   LEFT JOIN public."refGround" rg ON CAST(rg."refGroundId" AS INTEGER) = ub."refGroundId"
+// WHERE
+// ub."isDelete" IS NOT true
+// GROUP BY
+//   ub."refUserBookingId",
+//   rg."refGroundName",
+//   rg."refGroundCustId",
+//   rg."isAddOnAvailable",
+//   rg."refGroundPrice",
+//   rg."refGroundLocation",
+//   rg."refGroundPincode",
+//   rg."refGroundState"
+// ORDER BY
+//   ub."refUserBookingId" DESC;
+// `;
 
 export const deleteUserBookingQuery = `
 UPDATE
@@ -224,4 +252,13 @@ FROM
 WHERE
   ub."isDelete" IS NOT true
 
+`;
+
+export const listdashboardQuery = `
+SELECT
+  (SELECT COUNT(*) FROM public."refUserBooking" WHERE "isDelete" IS NOT true) AS "BookingCount",
+  (SELECT COUNT(*) FROM public."refGround" WHERE "isDelete" IS NOT true) AS "GroundCount",
+  (SELECT COUNT(*) FROM public."refSportsCategory" WHERE "isDelete" IS NOT true) AS "SportsCategory",
+  (SELECT COUNT(*) FROM public."users" WHERE "refCustId" LIKE 'CGA-CUS-%' AND "isDelete" IS NOT true ) AS "UserCount",
+  (SELECT COUNT(*) FROM public."users" WHERE "refCustId" LIKE 'CGA-OWN-%' AND "isDelete" IS NOT true) AS "OwenerCount";
 `;

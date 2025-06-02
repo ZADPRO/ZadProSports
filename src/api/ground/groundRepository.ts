@@ -186,6 +186,7 @@ export class groundRepository {
         refDescription,
         refStatus,
         IframeLink,
+        refTournamentPrice,
       } = userData;
 
       // Prepare array strings for Postgres arrays
@@ -223,6 +224,7 @@ export class groundRepository {
         refDescription,
         refStatus,
         IframeLink,
+        refTournamentPrice,
         CurrentTime(),
         tokendata.id,
       ];
@@ -508,6 +510,7 @@ export class groundRepository {
         refDescription,
         refStatus,
         IframeLink,
+        refTournamentPrice,
       } = userData;
 
       // Prepare array strings for Postgres arrays
@@ -538,8 +541,9 @@ export class groundRepository {
         "refStatus" = $14,
         "IframeLink" = $15,
         "updatedAt" = $16,
-        "updatedBy" = $17
-      WHERE "refGroundId" = $18
+        "updatedBy" = $17,
+        "refTournamentPrice" = $18
+      WHERE "refGroundId" = $19
     `,
         [
           refGroundName,
@@ -559,6 +563,7 @@ export class groundRepository {
           IframeLink,
           CurrentTime(),
           tokendata.id,
+          refTournamentPrice,
           refGroundId,
         ]
       );
@@ -1018,7 +1023,7 @@ export class groundRepository {
 
     try {
       const result = await executeQuery(listGroundQuery, [tokendata.id]);
-      const addons = await executeQuery(listaddonsQuery,[tokendata.id]);
+      const addons = await executeQuery(listaddonsQuery, [tokendata.id]);
 
       // for (const product of result) {
       //   if (product.refGroundImage) {
@@ -1137,15 +1142,11 @@ export class groundRepository {
 
       const { refGroundId } = userData;
       const result: any = await client.query(getGroundQuery, [refGroundId]);
-
       const getAddons = await executeQuery(getAvailableAddonsQuery, [
         refGroundId,
       ]);
-
-      const addons = await executeQuery(listaddonsQuery);
-
+      const addons = await executeQuery(listaddonsQuery, [refGroundId]);
       const imgResult = await executeQuery(imgResultQuery, [refGroundId]);
-      console.log("imgResult", imgResult);
 
       //  for (const image of imgResult) {
       //   if (image.refGroundImage) {

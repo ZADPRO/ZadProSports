@@ -184,6 +184,17 @@ export class userRoutes implements IRoute {
             auth: false,
           },
         },
+        {
+          method: "GET",
+          path: "/api/v1/userRoutes/listSportCategory",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.listSportCategory,
+            description: "listSportCategory",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
       ]);
       resolve(true);
     });
