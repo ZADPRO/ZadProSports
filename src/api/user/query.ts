@@ -603,6 +603,7 @@ WHERE
   "refStatus" IS true
   AND "isDelete" IS NOT true
   AND "refAddOn" != 'Ground'
+  AND "refGroundId" = $1
 `;
 
 export const getGroundPriceQuery = `
@@ -623,8 +624,10 @@ FROM
   LEFT JOIN public."refAddOns" ao ON CAST (ao."refAddOnsId" AS INTEGER) = sa."refAddOnsId"
 WHERE
   sa."refStatus" IS true
-  AND sa."isDelete" IS NOT true;
+  AND sa."isDelete" IS NOT true
+  AND sa."refGroundId" = $1
 `;
+
 export const listItemsQuery = `
 SELECT
   i.*,
@@ -636,16 +639,16 @@ FROM
   LEFT JOIN public."refAddOns" ao ON CAST(ao."refAddOnsId" AS INTEGER) = sa."refAddOnsId"
 WHERE
   i."refStatus" IS true
-  AND i."isDelete" IS NOT true;
+  AND i."isDelete" IS NOT true
+  AND i."refGroundId" = $1
 `;
 
 
 export const getconvertedDataAmountQuery = `
-SELECT
-  *
-FROM
-  public."tempStorage"
+SELECT *
+FROM public."tempStorage"
 WHERE
-  "tempStorageId" = $1
+  "createdBy" = $1
   AND "isDelete" IS NOT true
+  AND NOW() BETWEEN "createdAt"::timestamptz AND ("createdAt"::timestamptz + INTERVAL '5 minutes');
 `;
