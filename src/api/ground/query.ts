@@ -394,7 +394,7 @@ WHERE
   AND aa."refGroundId" = $1
   AND ao."refAddOnsId" != '1'
   AND ao."refStatus" IS true
-AND aa."createdBy"::INTEGER = $1::INTEGER
+AND aa."createdBy"::INTEGER = $2::INTEGER
   `;
 
 export const listBookedDatesQuery = `
@@ -536,5 +536,17 @@ WHERE
   AND "isDelete" IS NOT true
   AND "refAddOn" != 'Ground'
   AND "refGroundId" = $1
+   AND "createdBy"::integer = $2::integer
+`;
+export const listinListGroundaddonsQuery = `
+SELECT
+  *
+FROM
+  public."refAddOns"
+WHERE
+  "refStatus" IS true
+  AND "isDelete" IS NOT true
+  AND "refAddOn" != 'Ground'
+
    AND "createdBy"::integer = $1::integer
 `;

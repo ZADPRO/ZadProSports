@@ -36,6 +36,7 @@ import {
   getAvailableAddonsQuery,
   listaddonsQuery,
   imgResultQuery,
+  listinListGroundaddonsQuery,
 } from "./query";
 import { CurrentTime } from "../../helper/common";
 
@@ -1032,7 +1033,7 @@ export class groundRepository {
 
     try {
       const result = await executeQuery(listGroundQuery, [tokendata.id]);
-      const addons = await executeQuery(listaddonsQuery, [tokendata.id]);
+      const addons = await executeQuery(listinListGroundaddonsQuery, [tokendata.id]);
 
       // for (const product of result) {
       //   if (product.refGroundImage) {
