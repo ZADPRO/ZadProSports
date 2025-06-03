@@ -82,17 +82,33 @@ export class settingsResolver {
       domain_code
     );
   }
+  // public async listFeaturesV1(
+  //   user_data: any,
+  //   token_data: any,
+  //   domain_code: any
+  // ): Promise<any> {
+  //   return await this.settingsRepository.listFeaturesV1(
+  //     user_data,
+  //     token_data,
+  //     domain_code
+  //   );
+  // }
+
   public async listFeaturesV1(
     user_data: any,
     token_data: any,
     domain_code: any
   ): Promise<any> {
+    // console.log("User ID:", token_data.id, "Role ID:", token_data.roleId);
+    console.log("token_data", token_data);
+
     return await this.settingsRepository.listFeaturesV1(
       user_data,
       token_data,
       domain_code
     );
   }
+
   public async addUserGuidelinesV1(
     user_data: any,
     token_data: any,

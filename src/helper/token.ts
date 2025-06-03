@@ -29,8 +29,7 @@ function generateTokenWithExpire(
   }
 }
 
-
-const FIVE_MINUTES_EXPIRATION = '5m';
+const FIVE_MINUTES_EXPIRATION = "5m";
 
 export function generateTokenWith5MExpire(
   tokenData: object,
@@ -78,6 +77,7 @@ function decodeToken(token: string): JwtPayload | { error: string } {
 }
 
 // VALIDATE TOKEN
+
 function validateToken(request: any, h: ResponseToolkit) {
   const authHeader = request.headers.authorization;
   console.log("authHeader line ----- 66  \n \n", authHeader);
@@ -111,12 +111,50 @@ function validateToken(request: any, h: ResponseToolkit) {
 
   return h.continue;
 }
+function validateTokenwithRole(request: any, h: ResponseToolkit) {
+  const authHeader = request.headers.authorization;
+  console.log("authHeader line ----- 66  \n \n", authHeader);
+
+  if (!authHeader) {
+    return h.response({ error: "Token missing" }).code(401).takeover();
+  }
+
+  const token = authHeader.split(" ")[1];
+  console.log("token", token);
+
+  const decodedToken = decodeToken(token);
+  console.log("decodedToken", decodedToken);
+
+  // Check the decoded token result, not the decodeToken function itself
+  if ("error" in decodedToken) {
+    return h
+      .response(
+        encrypt(
+          {
+            token: false,
+            message: decodedToken.error,
+          },
+          true
+        )
+      )
+      .code(200)
+      .takeover();
+  }
+
+  // Now set the decoded token payload to plugins.token,
+  // this should contain id and roleId if token was generated correctly
+  request.plugins.token = decodedToken;
+  console.log("request.plugins.token", request.plugins.token);
+
+  return h.continue;
+}
 
 export {
   decodeToken,
   generateTokenWithExpire,
   validateToken,
   generateTokenWithoutExpire,
+  validateTokenwithRole,
 };
 
 const TOKEN_EXPIRATION_OTP = "2m";

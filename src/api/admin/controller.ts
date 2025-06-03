@@ -79,7 +79,9 @@ export class adminController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.listUserBookingsV1(request.payload, decodedToken);
@@ -109,7 +111,9 @@ export class adminController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.deleteBookingsV1(request.payload, decodedToken);
@@ -139,7 +143,9 @@ export class adminController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.listSignUpUsersV1(request.payload, decodedToken);
@@ -169,7 +175,9 @@ export class adminController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.listOverallAuditV1(request.payload, decodedToken);
@@ -199,7 +207,9 @@ export class adminController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.reportPageV1(request.payload, decodedToken);
@@ -229,7 +239,9 @@ export class adminController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.dashboardV1(request.payload, decodedToken);

@@ -117,7 +117,8 @@ FROM
   LEFT JOIN public."users" u ON CAST(u."refuserId" AS INTEGER) = ub."refUserId"
   LEFT JOIN public."refUsersDomain" ud ON CAST(ud."refUserId" AS INTEGER) = ub."refUserId"
 WHERE
-  ub."isDelete" IS NOT true
+  ub."isDelete" IS NOT true AND 
+  rg."createdBy"::int = $1
     ORDER BY
   ub."refUserBookingId" DESC;
 `;
@@ -256,9 +257,23 @@ WHERE
 
 export const listdashboardQuery = `
 SELECT
-  (SELECT COUNT(*) FROM public."refUserBooking" WHERE "isDelete" IS NOT true) AS "BookingCount",
-  (SELECT COUNT(*) FROM public."refGround" WHERE "isDelete" IS NOT true) AS "GroundCount",
-  (SELECT COUNT(*) FROM public."refSportsCategory" WHERE "isDelete" IS NOT true) AS "SportsCategory",
-  (SELECT COUNT(*) FROM public."users" WHERE "refCustId" LIKE 'CGA-CUS-%' AND "isDelete" IS NOT true ) AS "UserCount",
-  (SELECT COUNT(*) FROM public."users" WHERE "refCustId" LIKE 'CGA-OWN-%' AND "isDelete" IS NOT true) AS "OwenerCount";
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      public."refUserBooking" ub
+    LEFT JOIN public."refGround" rg ON CAST ( rg."refGroundId" AS INTEGER) = ub."refGroundId"
+    LEFT JOIN public."users" u ON CAST ( u."refuserId" AS INTEGER) = rg."createdBy"::int   
+    WHERE
+      ub."isDelete" IS NOT true AND u."refUserTypeId" = '3'
+  ) AS "BookingCount",
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      public."refGround" rg
+    LEFT JOIN public."users" u ON CAST ( u."refuserId" AS INTEGER) = rg."createdBy"::int
+    WHERE
+     rg."isDelete" IS NOT true AND u."refUserTypeId" = '3'
+  ) AS "GroundCount"
 `;

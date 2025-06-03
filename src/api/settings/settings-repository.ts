@@ -61,7 +61,9 @@ import {
 export class settingsRepository {
   public async addSportCategoryV1(userData: any, tokendata: any): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     try {
       await client.query("BEGIN");
@@ -128,7 +130,9 @@ export class settingsRepository {
     tokendata: any
   ): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     try {
       await client.query("BEGIN");
@@ -195,7 +199,9 @@ export class settingsRepository {
     userData: any,
     tokendata: any
   ): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 
@@ -269,7 +275,9 @@ export class settingsRepository {
     userData: any,
     tokendata: any
   ): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -300,8 +308,10 @@ export class settingsRepository {
   }
 
   public async addFeaturesV1(userData: any, tokendata: any): Promise<any> {
+    console.log("tokendata", tokendata);
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -329,6 +339,7 @@ export class settingsRepository {
 
         const duplicateCheck: any = await client.query(checkduplicateQuery, [
           refFeaturesName,
+          tokendata.id,
         ]);
 
         const count = Number(duplicateCheck.rows[0]?.count || 0);
@@ -388,7 +399,9 @@ export class settingsRepository {
   }
   public async updateFeaturesV1(userData: any, tokendata: any): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     try {
       await client.query("BEGIN");
@@ -397,6 +410,7 @@ export class settingsRepository {
 
       const check: any = await executeQuery(checkFeaturesQuery, [
         refFeaturesName,
+        tokendata.id,
       ]);
 
       const count = Number(check[0]?.count || 0); // safely convert to number
@@ -452,7 +466,9 @@ export class settingsRepository {
     }
   }
   public async deleteFeaturesV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 
@@ -523,11 +539,14 @@ export class settingsRepository {
     }
   }
   public async listFeaturesV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    console.log("tokendata", tokendata);
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listFeaturesQuery);
+      const result = await executeQuery(listFeaturesQuery, [tokendata.id]);
 
       return encrypt(
         {
@@ -558,7 +577,9 @@ export class settingsRepository {
     tokendata: any
   ): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -589,7 +610,7 @@ export class settingsRepository {
 
         const duplicateCheck: any = await client.query(
           checkUserGuidelinesduplicateQuery,
-          [refUserGuidelinesName]
+          [refUserGuidelinesName, tokendata.id]
         );
 
         const count = Number(duplicateCheck.rows[0]?.count || 0);
@@ -652,7 +673,9 @@ export class settingsRepository {
     tokendata: any
   ): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     try {
       await client.query("BEGIN");
@@ -661,6 +684,7 @@ export class settingsRepository {
 
       const check: any = await executeQuery(checkUserGuidelinesduplicateQuery, [
         refUserGuidelinesName,
+        tokendata.id,
       ]);
 
       const count = Number(check[0]?.count || 0); // safely convert to number
@@ -719,7 +743,9 @@ export class settingsRepository {
     userData: any,
     tokendata: any
   ): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 
@@ -808,11 +834,15 @@ export class settingsRepository {
     userData: any,
     tokendata: any
   ): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listUserGuidelinesQuery);
+      const result = await executeQuery(listUserGuidelinesQuery, [
+        tokendata.id,
+      ]);
 
       return encrypt(
         {
@@ -840,7 +870,9 @@ export class settingsRepository {
 
   public async addFacilitiesV1(userData: any, tokendata: any): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -928,7 +960,9 @@ export class settingsRepository {
   }
   public async updateFacilitiesV1(userData: any, tokendata: any): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     try {
       await client.query("BEGIN");
@@ -937,6 +971,7 @@ export class settingsRepository {
 
       const check: any = await executeQuery(checkFacilitiesNameduplicateQuery, [
         refFacilitiesName,
+        tokendata.id,
       ]);
 
       const count = Number(check[0]?.count || 0); // safely convert to number
@@ -992,7 +1027,9 @@ export class settingsRepository {
     }
   }
   public async deleteFacilitiesV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 
@@ -1078,11 +1115,13 @@ export class settingsRepository {
     }
   }
   public async listFacilitiesV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listFacilitiesQuery);
+      const result = await executeQuery(listFacilitiesQuery, [tokendata.id]);
 
       return encrypt(
         {
@@ -1113,7 +1152,9 @@ export class settingsRepository {
     tokendata: any
   ): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -1144,7 +1185,7 @@ export class settingsRepository {
 
         const duplicateCheck: any = await client.query(
           checkAdditionalTipsduplicateQuery,
-          [refAdditionalTipsName]
+          [refAdditionalTipsName, tokendata.id]
         );
 
         const count = Number(duplicateCheck.rows[0]?.count || 0);
@@ -1207,7 +1248,9 @@ export class settingsRepository {
     tokendata: any
   ): Promise<any> {
     const client: PoolClient = await getClient();
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     try {
       await client.query("BEGIN");
@@ -1216,6 +1259,7 @@ export class settingsRepository {
 
       const check: any = await executeQuery(checkAdditionalTipsduplicateQuery, [
         refAdditionalTipsName,
+        tokendata.id,
       ]);
 
       const count = Number(check[0]?.count || 0); // safely convert to number
@@ -1274,7 +1318,9 @@ export class settingsRepository {
     userData: any,
     tokendata: any
   ): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 
@@ -1363,11 +1409,15 @@ export class settingsRepository {
     userData: any,
     tokendata: any
   ): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listAdditionalTipsQuery);
+      const result = await executeQuery(listAdditionalTipsQuery, [
+        tokendata.id,
+      ]);
 
       return encrypt(
         {
@@ -1775,7 +1825,7 @@ export class settingsRepository {
 
     try {
       const result = await executeQuery(listFoodAndSnacksQuery);
-    
+
       for (const product of result) {
         if (product.refFoodImage) {
           try {
@@ -1787,11 +1837,11 @@ export class settingsRepository {
             };
           } catch (err) {
             console.error(
-              `Error reading image file for product ${product.refFoodImage}:` ,
+              `Error reading image file for product ${product.refFoodImage}:`,
               err
             );
             product.refFoodImage = null; // Handle missing or unreadable files gracefully
-            console.log('product.refFoodImage', product.refFoodImage)
+            console.log("product.refFoodImage", product.refFoodImage);
           }
         }
       }
@@ -2148,6 +2198,4 @@ export class settingsRepository {
       );
     }
   }
-
-  
 }

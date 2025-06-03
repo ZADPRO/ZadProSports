@@ -470,6 +470,7 @@ FROM
 WHERE
   "isDelete" IS NOT true
   AND "refStatus" IS true
+   AND "createdBy"::int = $1
 `;
 
 export const addAddOnsAvailabilityQuery = `

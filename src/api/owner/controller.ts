@@ -3,7 +3,7 @@ import * as Boom from "@hapi/boom";
 
 import logger from "../../helper/logger";
 
-import { decodeToken } from "../../helper/token"
+import { decodeToken } from "../../helper/token";
 import { ownerResolver } from "./resolver";
 
 export class ownerController {
@@ -19,9 +19,10 @@ export class ownerController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
       entity = await this.resolver.addOwnersV1(request.payload, decodedToken);
 
@@ -29,9 +30,8 @@ export class ownerController {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in addOwners" , error);
+      logger.error("Error in addOwners", error);
       return response
         .response({
           success: false,
@@ -43,5 +43,4 @@ export class ownerController {
         .code(500);
     }
   };
- 
 }

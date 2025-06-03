@@ -229,7 +229,10 @@ export class adminRepository {
       }
 
       // validPassword === true
-      const tokenData = { id: user.refUserId };
+      // const tokenData = { id: user.refUserId };
+
+      const tokenData = { id: user.refUserId, roleId: refUserTypeId };
+      console.log("tokenData", tokenData);
 
       const history = [
         2,
@@ -241,6 +244,9 @@ export class adminRepository {
 
       await client.query(updateHistoryQuery, history);
       await client.query("COMMIT");
+
+      const generatedToken = generateTokenWithExpire(tokenData, true);
+      console.log("generatedToken", generatedToken);
 
       return encrypt(
         {
@@ -298,11 +304,13 @@ export class adminRepository {
   //   }
   // }
   public async listUserBookingsV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listUserBookingsQuery);
+      const result = await executeQuery(listUserBookingsQuery, [tokendata.id]);
 
       const parsedPayloadArray = [];
 
@@ -341,7 +349,9 @@ export class adminRepository {
     }
   }
   public async deleteBookingsV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 
@@ -405,7 +415,9 @@ export class adminRepository {
     }
   }
   public async listSignUpUsersV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -435,7 +447,9 @@ export class adminRepository {
     }
   }
   public async listOverallAuditV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -465,7 +479,9 @@ export class adminRepository {
     }
   }
   public async reportPageV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -495,7 +511,9 @@ export class adminRepository {
     }
   }
   public async dashboardV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
     const tokens = generateTokenWithExpire(token, true);
 
     try {

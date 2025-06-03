@@ -1,7 +1,7 @@
 import * as Hapi from "@hapi/hapi";
 
 // import { Logger } from "winston";
-import { decodeToken, validateToken } from "../../helper/token";
+import { decodeToken, validateToken, validateTokenwithRole } from "../../helper/token";
 import IRoute from "../../helper/routes";
 import validate from "./validate";
 import { settingsController } from "./controller";
@@ -98,6 +98,7 @@ export class settingsRoutes implements IRoute {
           method: "GET",
           path: "/api/v1/settingRoutes/listFeatures",
           config: {
+            // pre: [{ method: validateToken, assign: "token" }],
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.listFeatures,
             description: "list Features",

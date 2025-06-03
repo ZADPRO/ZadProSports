@@ -20,7 +20,9 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId,
       };
+
       let entity;
       entity = await this.resolver.addSportCategoryV1(
         request.payload,
@@ -52,6 +54,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.updateSportCategoryV1(
@@ -84,6 +87,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.deleteSportCategoryV1(
@@ -116,6 +120,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.listSportCategoryV1(
@@ -140,6 +145,7 @@ export class settingsController {
         .code(500);
     }
   };
+
   public addFeatures = async (
     request: any,
     response: Hapi.ResponseToolkit
@@ -148,6 +154,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId,
       };
       let entity;
       entity = await this.resolver.addFeaturesV1(request.payload, decodedToken);
@@ -177,6 +184,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.updateFeaturesV1(
@@ -209,6 +217,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.deleteFeaturesV1(
@@ -241,7 +250,9 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
+      console.log("decodedToken", decodedToken);
       let entity;
       entity = await this.resolver.listFeaturesV1(
         request.payload,
@@ -265,6 +276,7 @@ export class settingsController {
         .code(500);
     }
   };
+
   public addUserGuidelines = async (
     request: any,
     response: Hapi.ResponseToolkit
@@ -273,6 +285,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.addUserGuidelinesV1(
@@ -305,6 +318,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.updateUserGuidelinesV1(
@@ -337,6 +351,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.deleteUserGuidelinesV1(
@@ -369,6 +384,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.listUserGuidelinesV1(
@@ -393,6 +409,7 @@ export class settingsController {
         .code(500);
     }
   };
+
   public addFacilities = async (
     request: any,
     response: Hapi.ResponseToolkit
@@ -401,6 +418,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.addFacilitiesV1(
@@ -433,6 +451,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.updateFacilitiesV1(
@@ -465,6 +484,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.deleteFacilitiesV1(
@@ -497,6 +517,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.listFacilitiesV1(
@@ -521,6 +542,7 @@ export class settingsController {
         .code(500);
     }
   };
+  
   public addAdditionalTips = async (
     request: any,
     response: Hapi.ResponseToolkit
@@ -529,6 +551,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.addAdditionalTipsV1(
@@ -561,6 +584,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.updateAdditionalTipsV1(
@@ -593,7 +617,9 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
+      console.log("decodedToken", decodedToken);
       let entity;
       entity = await this.resolver.deleteAdditionalTipsV1(
         request.payload,
@@ -625,6 +651,7 @@ export class settingsController {
     try {
       const decodedToken = {
         id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
       entity = await this.resolver.listAdditionalTipsV1(

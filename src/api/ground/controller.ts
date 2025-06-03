@@ -20,7 +20,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.addGroundV1(request.payload, decodedToken);
@@ -50,7 +52,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.updateGroundV1(request.payload, decodedToken);
@@ -80,7 +84,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.uploadRoomImageV1(request.payload, decodedToken);
@@ -110,7 +116,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.deleteRoomImageV1(request.payload, decodedToken);
@@ -140,7 +148,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.uploadGroundImageV1(request.payload, decodedToken);
@@ -170,7 +180,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.deleteGroundImageV1(request.payload, decodedToken);
@@ -200,7 +212,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.listGroundV1(request.payload, decodedToken);
@@ -230,7 +244,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.deleteGroundV1(request.payload, decodedToken);
@@ -260,7 +276,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.getGroundV1(request.payload, decodedToken);
@@ -290,7 +308,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.addAddonsV1(request.payload, decodedToken);
@@ -320,7 +340,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.updateAddonsV1(request.payload, decodedToken);
@@ -350,7 +372,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.deleteAddonsV1(request.payload, decodedToken);
@@ -380,7 +404,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.listAddOnsV1(request.payload, decodedToken);
@@ -410,7 +436,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.addAddonAvailabilityV1(request.payload, decodedToken);
@@ -440,7 +468,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.updateAddonAvailabilityV1(request.payload, decodedToken);
@@ -470,7 +500,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.deleteAddonAvailabilityV1(request.payload, decodedToken);
@@ -500,7 +532,9 @@ export class groundController {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
       const decodedToken ={
-        id:request.plugins.token.id
+        id:request.plugins.token.id,
+                roleId: request.plugins.token.roleId, // Add this
+
       }
       let entity;
       entity = await this.resolver.listAddonAvailabilityV1(request.payload, decodedToken);

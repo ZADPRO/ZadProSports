@@ -86,6 +86,7 @@ FROM
   public."refFeatures"
 WHERE
   "refFeaturesName" = $1
+  AND "createdBy"::integer = $2::integer
   AND "isDelete" IS NOT true;
 `;
 
@@ -109,6 +110,7 @@ FROM
   public."refFeatures"
 WHERE
   "refFeaturesName" = $1
+    AND "createdBy"::integer = $2::integer
   AND "isDelete" IS NOT true;
 `;
 
@@ -153,8 +155,9 @@ SELECT
   *
 FROM
   public."refFeatures"
-  WHERE
+WHERE
   "isDelete" IS NOT true
+  AND "createdBy"::int = $1
 `;
 
 export const checkUserGuidelinesduplicateQuery = `
@@ -164,6 +167,8 @@ FROM
   public."refUserGuidelines"
 WHERE
   "refUserGuidelinesName" = $1
+    AND "createdBy"::integer = $2::integer
+
   AND "isDelete" IS NOT true;
 `;
 export const addUserGuidelinesQuery = `
@@ -221,6 +226,7 @@ FROM
   public."refUserGuidelines"
   WHERE
   "isDelete" IS NOT true
+   AND "createdBy"::int = $1
 `;
 export const checkFacilitiesNameduplicateQuery = `
 SELECT
@@ -229,6 +235,8 @@ FROM
   public."refFacilities"
 WHERE
   "refFacilitiesName" = $1
+    AND "createdBy"::integer = $2::integer
+
   AND "isDelete" IS NOT true;
 `;
 
@@ -278,6 +286,7 @@ FROM
   public."refFacilities"
   WHERE
   "isDelete" IS NOT true
+   AND "createdBy"::int = $1
 `;
 
 export const checkAdditionalTipsduplicateQuery = `
@@ -287,6 +296,8 @@ FROM
   public."refAdditionalTips"
 WHERE
   "refAdditionalTipsName" = $1
+    AND "createdBy"::integer = $2::integer
+
   AND "isDelete" IS NOT true;
 `;
 export const addAditionalTipsQuery = `
@@ -336,6 +347,7 @@ FROM
   public."refAdditionalTips"
   WHERE
   "isDelete" IS NOT true
+   AND "createdBy"::int = $1
 `;
 
 export const checkFoodAndSnacksQuery = `
