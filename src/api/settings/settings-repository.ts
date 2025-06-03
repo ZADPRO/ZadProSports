@@ -41,7 +41,10 @@ import {
   getdeleteUserGuidelineQuery,
   getFoodImageRecordQuery,
   listAdditionalTipsQuery,
+  listAllAdditionalTipsQuery,
+  listAllFacilitiesQuery,
   listAllFeaturesQuery,
+  listAllUserGuidelinesQuery,
   listFacilitiesQuery,
   listFeaturesQuery,
   listFoodAndSnacksQuery,
@@ -540,7 +543,6 @@ export class settingsRepository {
     }
   }
   public async listFeaturesV1(userData: any, tokendata: any): Promise<any> {
-    console.log("tokendata", tokendata);
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
 
@@ -554,6 +556,7 @@ export class settingsRepository {
         result = await executeQuery(listFeaturesQuery, [tokendata.id]);
       } else {
         result = await executeQuery(listAllFeaturesQuery);
+        console.log("result", result);
       }
       return encrypt(
         {
@@ -847,10 +850,18 @@ export class settingsRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listUserGuidelinesQuery, [
-        tokendata.id,
-      ]);
+      // const result = await executeQuery(listUserGuidelinesQuery, [
+      //   tokendata.id,
+      // ]);
 
+      let result; // ✅ Declare outside block
+
+      if (tokendata.roleId != 1) {
+        result = await executeQuery(listUserGuidelinesQuery, [tokendata.id]);
+      } else {
+        result = await executeQuery(listAllUserGuidelinesQuery);
+        console.log("result", result);
+      }
       return encrypt(
         {
           success: true,
@@ -907,9 +918,7 @@ export class settingsRepository {
 
         const duplicateCheck: any = await client.query(
           checkFacilitiesNameduplicateQuery,
-          [refFacilitiesName,
-            tokendata.id
-          ]
+          [refFacilitiesName, tokendata.id]
         );
 
         const count = Number(duplicateCheck.rows[0]?.count || 0);
@@ -1130,8 +1139,16 @@ export class settingsRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listFacilitiesQuery, [tokendata.id]);
+      // const result = await executeQuery(listFacilitiesQuery, [tokendata.id]);
 
+        let result; // ✅ Declare outside block
+
+      if (tokendata.roleId != 1) {
+        result = await executeQuery(listFacilitiesQuery, [tokendata.id]);
+      } else {
+        result = await executeQuery(listAllFacilitiesQuery);
+        console.log('result', result)
+      }
       return encrypt(
         {
           success: true,
@@ -1424,9 +1441,18 @@ export class settingsRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listAdditionalTipsQuery, [
-        tokendata.id,
-      ]);
+      // const result = await executeQuery(listAdditionalTipsQuery, [
+      //   tokendata.id,
+      // ]);
+      
+        let result; // ✅ Declare outside block
+
+      if (tokendata.roleId != 1) {
+        result = await executeQuery(listAdditionalTipsQuery, [tokendata.id]);
+      } else {
+        result = await executeQuery(listAllAdditionalTipsQuery);
+        console.log('result', result)
+      }
 
       return encrypt(
         {

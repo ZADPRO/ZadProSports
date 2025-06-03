@@ -237,6 +237,14 @@ FROM
   "isDelete" IS NOT true
    AND "createdBy"::int = $1
 `;
+export const listAllUserGuidelinesQuery = `
+SELECT
+  *
+FROM
+  public."refUserGuidelines"
+  WHERE
+  "isDelete" IS NOT true
+`;
 export const checkFacilitiesNameduplicateQuery = `
 SELECT
   COUNT(*) AS "count"
@@ -296,6 +304,14 @@ FROM
   WHERE
   "isDelete" IS NOT true
    AND "createdBy"::int = $1
+`;
+export const listAllFacilitiesQuery = `
+SELECT
+  *
+FROM
+  public."refFacilities"
+  WHERE
+  "isDelete" IS NOT true
 `;
 
 export const checkAdditionalTipsduplicateQuery = `
@@ -357,6 +373,14 @@ FROM
   WHERE
   "isDelete" IS NOT true
    AND "createdBy"::int = $1
+`;
+export const listAllAdditionalTipsQuery = `
+SELECT
+  *
+FROM
+  public."refAdditionalTips"
+  WHERE
+  "isDelete" IS NOT true
 `;
 
 export const checkFoodAndSnacksQuery = `

@@ -1157,8 +1157,11 @@ export class groundRepository {
       const result: any = await client.query(getGroundQuery, [refGroundId]);
       const getAddons = await executeQuery(getAvailableAddonsQuery, [
         refGroundId,
+        tokendata.id
       ]);
-      const addons = await executeQuery(listaddonsQuery, [refGroundId]);
+      const addons = await executeQuery(listaddonsQuery, [refGroundId,
+        tokendata.id
+      ]);
       const imgResult = await executeQuery(imgResultQuery, [refGroundId]);
 
       //  for (const image of imgResult) {
