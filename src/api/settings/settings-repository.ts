@@ -41,6 +41,7 @@ import {
   getdeleteUserGuidelineQuery,
   getFoodImageRecordQuery,
   listAdditionalTipsQuery,
+  listAllFeaturesQuery,
   listFacilitiesQuery,
   listFeaturesQuery,
   listFoodAndSnacksQuery,
@@ -546,8 +547,14 @@ export class settingsRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listFeaturesQuery, [tokendata.id]);
+      // const result = await executeQuery(listFeaturesQuery, [tokendata.id]);
+      let result; // ✅ Declare outside block
 
+      if (tokendata.roleId != 1) {
+        result = await executeQuery(listFeaturesQuery, [tokendata.id]);
+      } else {
+        result = await executeQuery(listAllFeaturesQuery);
+      }
       return encrypt(
         {
           success: true,
@@ -900,7 +907,9 @@ export class settingsRepository {
 
         const duplicateCheck: any = await client.query(
           checkFacilitiesNameduplicateQuery,
-          [refFacilitiesName]
+          [refFacilitiesName,
+            tokendata.id
+          ]
         );
 
         const count = Number(duplicateCheck.rows[0]?.count || 0);

@@ -159,6 +159,15 @@ WHERE
   "isDelete" IS NOT true
   AND "createdBy"::int = $1
 `;
+export const listAllFeaturesQuery = `
+SELECT
+  *
+FROM
+  public."refFeatures"
+WHERE
+  "isDelete" IS NOT true
+
+`;
 
 export const checkUserGuidelinesduplicateQuery = `
 SELECT
