@@ -37,6 +37,7 @@ import {
   listUnavailableAddonsQuery,
   listUserAuditPageQuery,
   listUserBookingHistoryQuery,
+  selectOwnerByLogin,
   selectUserByLogin,
   updateHistoryQuery,
   updateUserDataQuery,
@@ -47,498 +48,106 @@ import { generateforgotPasswordEmailContent } from "../../helper/mailcontent";
 import { sendEmail } from "../../helper/mail";
 
 export class userRepository {
-  // public async userGroundBookingV1(
-  //   userData: any,
-  //   tokendata: any
-  // ): Promise<any> {
+  // public async loginV1(user_data: any, domain_code?: any): Promise<any> {
   //   const client: PoolClient = await getClient();
-  //   const token = { id: tokendata.id };
-  //   const tokens = generateTokenWithExpire(token, true);
-
-  //   const generateDateRange = (start: string, end: string): string[] => {
-  //     const parseDMY = (dateStr: string): Date => {
-  //       const [day, month, year] = dateStr.split("-").map(Number);
-  //       return new Date(year, month - 1, day);
-  //     };
-
-  //     const formatDMY = (date: Date): string => {
-  //       const day = String(date.getDate()).padStart(2, "0");
-  //       const month = String(date.getMonth() + 1).padStart(2, "0");
-  //       const year = date.getFullYear();
-  //       return `${day}-${month}-${year}`;
-  //     };
-
-  //     const dateArray: string[] = [];
-  //     const currentDate = parseDMY(start);
-  //     const stopDate = parseDMY(end);
-
-  //     while (currentDate <= stopDate) {
-  //       dateArray.push(formatDMY(currentDate));
-  //       currentDate.setDate(currentDate.getDate() + 1);
-  //     }
-  //     return dateArray;
-  //   };
 
   //   try {
-  //     await client.query("BEGIN");
+  //     const params = [user_data.login, user_data.roleID];
+  //     if(user_data.roleID===2){
+  //     const users: any = await client.query(selectUserByLogin, params);
+  //     }
+  //     else{
+  //             const owner: any = await client.query(selectOwnerByLogin, params);
 
-  //     const {
-  //       refGroundId,
-  //       isAddonNeeded,
-  //       refBookingTypeId,
-  //       refBookingStartDate,
-  //       refBookingEndDate,
-  //       refStartTime,
-  //       refEndTime,
-  //       additionalNotes,
-  //       refAddOns = [],
-  //     } = userData;
-
-  //     const refAddOnsId = isAddonNeeded
-  //       ? `{${refAddOns.map((a: any) => a.refAddOnsId).join(",")}}`
-  //       : null;
-  //     const endDate = refBookingTypeId === 1 ? refBookingEndDate : null;
-
-  //     const groundPriceRes = await executeQuery(getGroundPriceQuery, [
-  //       refGroundId,
-  //     ]);
-  //     const refGroundPrice = Number(groundPriceRes[0]?.refGroundPrice || 0);
-
-  //     let dateList: string[] = [];
-  //     if (refBookingTypeId === 1 && refBookingStartDate && refBookingEndDate) {
-  //       dateList = generateDateRange(refBookingStartDate, refBookingEndDate);
   //     }
 
-  //     const totalGroundPrice =
-  //       dateList.length > 0 ? dateList.length * refGroundPrice : refGroundPrice;
-
-  //     let totalAddonPrice = 0;
-  //     const addonPriceDetails: any[] = [];
-
-  //     if (isAddonNeeded) {
-  //       for (const addon of refAddOns) {
-  //         const {
-  //           refAddOnsId,
-  //           selectedDates = [],
-  //           refPersonCount = 1,
-  //           isSubaddonNeeded,
-  //           refSubaddons = [],
-  //         } = addon;
-
-  //         let addonTotal = 0;
-
-  //         for (const date of selectedDates) {
-  //           let dailyAddonTotal = 0;
-
-  //           if (isSubaddonNeeded) {
-  //             for (const sub of refSubaddons) {
-  //               const { refSubaddonId, isItemsNeeded, refItems = [] } = sub;
-
-  //               if (isItemsNeeded && refItems.length > 0) {
-  //                 for (const item of refItems) {
-  //                   const itemPriceRes = await executeQuery(
-  //                     `SELECT "refItemsPrice" FROM public."refItems" WHERE "refItemsId" = $1`,
-  //                     [item.refItemsId]
-  //                   );
-  //                   const itemPrice = Number(
-  //                     itemPriceRes[0]?.refItemsPrice || 0
-  //                   );
-  //                   dailyAddonTotal += itemPrice * refPersonCount;
-  //                 }
-  //               } else {
-  //                 const subPriceRes = await executeQuery(
-  //                   `SELECT "refSubAddOnPrice" FROM public."subAddOns" WHERE "subAddOnsId" = $1`,
-  //                   [refSubaddonId]
-  //                 );
-  //                 const subPrice = Number(
-  //                   subPriceRes[0]?.refSubAddOnPrice || 0
-  //                 );
-  //                 dailyAddonTotal += subPrice * refPersonCount;
-  //               }
-  //             }
-  //           } else {
-  //             const addonPriceRes = await executeQuery(
-  //               `SELECT "refAddonPrice" FROM public."refAddOns" WHERE "refAddOnsId" = $1`,
-  //               // [refAddOnsId]
-  //               [addon.refAddOnsId] // ✅ Use the current addon's ID
-  //             );
-  //             const addonPrice = Number(addonPriceRes[0]?.refAddonPrice || 0);
-  //             dailyAddonTotal += addonPrice * refPersonCount;
-  //           }
-
-  //           addonTotal += dailyAddonTotal;
-  //           totalAddonPrice += dailyAddonTotal;
-  //         }
-
-  //         addonPriceDetails.push({
-  //           refAddOnsId,
-  //           selectedDates,
-  //           isSubaddonNeeded,
-  //           refPersonCount,
-  //           addonAmount: addonTotal,
-  //         });
-  //       }
-  //     }
-
-  //     const subtotal = totalGroundPrice + totalAddonPrice;
-  //     const refSGSTAmount = +(subtotal * 0.09).toFixed(2);
-  //     const refCGSTAmount = +(subtotal * 0.09).toFixed(2);
-  //     const refTotalAmount = subtotal + refSGSTAmount + refCGSTAmount;
-
-  //     const bookingParams = [
-  //       tokendata.id,
-  //       refGroundId,
-  //       refBookingTypeId,
-  //       refAddOnsId,
-  //       refBookingStartDate,
-  //       endDate,
-  //       refStartTime,
-  //       refEndTime,
-  //       additionalNotes,
-  //       refTotalAmount,
-  //       CurrentTime(),
-  //       tokendata.id,
-  //       totalGroundPrice,
-  //       refSGSTAmount,
-  //       refCGSTAmount,
-  //     ];
-
-  //     const result = await client.query(adduserBookingQuery, bookingParams);
-
-  //     for (const addon of refAddOns) {
-  //       for (const date of addon.selectedDates || []) {
-  //         await client.query(
-  //           `INSERT INTO public."addOnUnAvailability" (
-  //           "unAvailabilityDate",
-  //           "refAddOnsId",
-  //           "refGroundId",
-  //           "createdAt",
-  //           "createdBy",
-  //           "refAddOnsPrice"
-  //         ) VALUES ($1, $2, $3, $4, $5, $6)`,
-  //           [
-  //             date,
-  //             addon.refAddOnsId,
-  //             refGroundId,
-  //             CurrentTime(),
-  //             tokendata.id,
-  //             0,
-  //           ]
-  //         );
-  //       }
-  //     }
-
-  //     if (dateList.length > 0) {
-  //       for (const date of dateList) {
-  //         await client.query(
-  //           `INSERT INTO public."addOnUnAvailability" (
-  //           "unAvailabilityDate",
-  //           "refAddOnsId",
-  //           "refGroundId",
-  //           "createdAt",
-  //           "createdBy",
-  //           "refAddOnsPrice"
-  //         ) VALUES ($1, $2, $3, $4, $5, $6)`,
-  //           [
-  //             date,
-  //             1, // default addon ID for ground unavailability
-  //             refGroundId,
-  //             CurrentTime(),
-  //             tokendata.id,
-  //             0,
-  //           ]
-  //         );
-  //       }
-  //     }
-
-  //     const deletestorage = await client.query(deletestorageQuery, [
-  //       tokendata.id,
-  //     ]);
-  //     console.log("deletestorage", deletestorage);
-
-  //     await client.query(updateHistoryQuery, [
-  //       28,
-  //       tokendata.id,
-  //       `Ground booked successfully`,
-  //       CurrentTime(),
-  //       tokendata.id,
-  //     ]);
-
-  //     await client.query("COMMIT");
-
-  //     return encrypt(
-  //       {
-  //         success: true,
-  //         message: "Ground booked successfully",
-  //         result,
-  //         token: tokens,
-  //         totalGroundPrice,
-  //         totalAddonPrice,
-  //         addonPriceDetails,
-  //         refSGSTAmount,
-  //         refCGSTAmount,
-  //         refTotalAmount,
-  //       },
-  //       true
-  //     );
-  //   } catch (error) {
-  //     await client.query("ROLLBACK");
-  //     console.error("Booking error:", error);
-
-  //     return encrypt(
-  //       {
-  //         success: false,
-  //         message: "Error during booking",
-  //         error: String(error),
-  //         token: tokens,
-  //       },
-  //       true
-  //     );
-  //   } finally {
-  //     client.release();
-  //   }
-  // }
-
-  // public async userGroundBookingV1(
-  //   userData: any,
-  //   tokendata: any
-  // ): Promise<any> {
-  //   const client: PoolClient = await getClient();
-  //   const token = { id: tokendata.id };
-  //   const tokens = generateTokenWithExpire(token, true);
-
-  //   const parseDMY = (dateStr: string): Date => {
-  //     const [day, month, year] = dateStr.split("-").map(Number);
-  //     return new Date(year, month - 1, day);
-  //   };
-
-  //   const formatDMY = (date: Date): string => {
-  //     return `${String(date.getDate()).padStart(2, "0")}-${String(
-  //       date.getMonth() + 1
-  //     ).padStart(2, "0")}-${date.getFullYear()}`;
-  //   };
-
-  //   const generateDateRange = (start: string, end: string): string[] => {
-  //     const result: string[] = [];
-  //     const currentDate = parseDMY(start);
-  //     const stopDate = parseDMY(end);
-  //     while (currentDate <= stopDate) {
-  //       result.push(formatDMY(currentDate));
-  //       currentDate.setDate(currentDate.getDate() + 1);
-  //     }
-  //     return result;
-  //   };
-
-  //   const getItemPrice = async (itemId: number): Promise<number> => {
-  //     const res = await executeQuery(
-  //       `SELECT "refItemsPrice" FROM public."refItems" WHERE "refItemsId" = $1`,
-  //       [itemId]
-  //     );
-  //     return Number(res[0]?.refItemsPrice || 0);
-  //   };
-
-  //   const getSubAddonPrice = async (subId: number): Promise<number> => {
-  //     const res = await executeQuery(
-  //       `SELECT "refSubAddOnPrice" FROM public."subAddOns" WHERE "subAddOnsId" = $1`,
-  //       [subId]
-  //     );
-  //     return Number(res[0]?.refSubAddOnPrice || 0);
-  //   };
-
-  //   const getAddonPrice = async (addonId: number): Promise<number> => {
-  //     const res = await executeQuery(
-  //       `SELECT "refAddonPrice" FROM public."refAddOns" WHERE "refAddOnsId" = $1`,
-  //       [addonId]
-  //     );
-  //     return Number(res[0]?.refAddonPrice || 0);
-  //   };
-
-  //   try {
-  //     await client.query("BEGIN");
-
-  //     const {
-  //       refGroundId,
-  //       isAddonNeeded = false,
-  //       refBookingTypeId,
-  //       refBookingStartDate,
-  //       refBookingEndDate,
-  //       refStartTime,
-  //       refEndTime,
-  //       additionalNotes = "",
-  //       refAddOns = [],
-  //     } = userData;
-
-  //     if (!refGroundId || !refBookingTypeId || !refBookingStartDate) {
-  //       throw new Error("Required booking details are missing.");
-  //     }
-
-  //     const endDate = refBookingTypeId === 1 ? refBookingEndDate : null;
-  //     const refAddOnsId =
-  //       isAddonNeeded && refAddOns.length > 0
-  //         ? `{${refAddOns.map((a: any) => a.refAddOnsId).join(",")}}`
-  //         : null;
-
-  //     const groundPriceRes = await executeQuery(getGroundPriceQuery, [
-  //       refGroundId,
-  //     ]);
-  //     const refGroundPrice = Number(groundPriceRes[0]?.refGroundPrice || 0);
-
-  //     const dateList =
-  //       refBookingTypeId === 1 && refBookingEndDate
-  //         ? generateDateRange(refBookingStartDate, refBookingEndDate)
-  //         : [refBookingStartDate];
-
-  //     const totalGroundPrice = dateList.length * refGroundPrice;
-
-  //     let totalAddonPrice = 0;
-  //     const addonPriceDetails: any[] = [];
-
-  //     if (isAddonNeeded && refAddOns.length > 0) {
-  //       for (const addon of refAddOns) {
-  //         const {
-  //           refAddOnsId,
-  //           selectedDates = [],
-  //           refPersonCount = 1,
-  //           isSubaddonNeeded = false,
-  //           refSubaddons = [],
-  //         } = addon;
-
-  //         let addonTotal = 0;
-
-  //         for (const date of selectedDates) {
-  //           let dailyAddonTotal = 0;
-
-  //           if (isSubaddonNeeded) {
-  //             for (const sub of refSubaddons) {
-  //               const {
-  //                 refSubaddonId,
-  //                 isItemsNeeded = false,
-  //                 refItems = [],
-  //               } = sub;
-
-  //               if (isItemsNeeded && refItems.length > 0) {
-  //                 for (const item of refItems) {
-  //                   dailyAddonTotal +=
-  //                     (await getItemPrice(item.refItemsId)) * refPersonCount;
-  //                 }
-  //               } else {
-  //                 dailyAddonTotal +=
-  //                   (await getSubAddonPrice(refSubaddonId)) * refPersonCount;
-  //               }
-  //             }
-  //           } else {
-  //             dailyAddonTotal +=
-  //               (await getAddonPrice(refAddOnsId)) * refPersonCount;
-  //           }
-
-  //           addonTotal += dailyAddonTotal;
-  //           totalAddonPrice += dailyAddonTotal;
-  //         }
-
-  //         addonPriceDetails.push({
-  //           refAddOnsId,
-  //           selectedDates,
-  //           isSubaddonNeeded,
-  //           refPersonCount,
-  //           addonAmount: addonTotal,
-  //         });
-  //       }
-  //     }
-
-  //     const subtotal = totalGroundPrice + totalAddonPrice;
-  //     const refSGSTAmount = +(subtotal * 0.09).toFixed(2);
-  //     const refCGSTAmount = +(subtotal * 0.09).toFixed(2);
-  //     const refTotalAmount = subtotal + refSGSTAmount + refCGSTAmount;
-
-  //     const bookingParams = [
-  //       tokendata.id,
-  //       refGroundId,
-  //       refBookingTypeId,
-  //       refAddOnsId,
-  //       refBookingStartDate,
-  //       endDate,
-  //       refStartTime,
-  //       refEndTime,
-  //       additionalNotes,
-  //       refTotalAmount,
-  //       CurrentTime(),
-  //       tokendata.id,
-  //       totalGroundPrice,
-  //       refSGSTAmount,
-  //       refCGSTAmount,
-  //       userData.transactionId,
-  //     ];
-
-  //     const result = await client.query(adduserBookingQuery, bookingParams);
-
-  //     // Add-on unavailability entries
-  //     if (isAddonNeeded) {
-  //       for (const addon of refAddOns) {
-  //         for (const date of addon.selectedDates || []) {
-  //           await client.query(
-  //             `INSERT INTO public."addOnUnAvailability" (
-  //             "unAvailabilityDate", "refAddOnsId", "refGroundId", "createdAt", "createdBy", "refAddOnsPrice"
-  //           ) VALUES ($1, $2, $3, $4, $5, $6)`,
-  //             [
-  //               date,
-  //               addon.refAddOnsId,
-  //               refGroundId,
-  //               CurrentTime(),
-  //               tokendata.id,
-  //               0,
-  //             ]
-  //           );
-  //         }
-  //       }
-  //     }
-
-  //     // Ground booking unavailability
-  //     for (const date of dateList) {
-  //       await client.query(
-  //         `INSERT INTO public."addOnUnAvailability" (
-  //         "unAvailabilityDate", "refAddOnsId", "refGroundId", "createdAt", "createdBy", "refAddOnsPrice"
-  //       ) VALUES ($1, $2, $3, $4, $5, $6)`,
-  //         [date, 1, refGroundId, CurrentTime(), tokendata.id, 0] // 1 is default for ground
+  //     if (!users.rows || users.rows.length === 0) {
+  //       return encrypt(
+  //         {
+  //           success: false,
+  //           message: "Invalid Login Credentials",
+  //         },
+  //         true
   //       );
   //     }
 
-  //     await client.query(deletestorageQuery, [tokendata.id]);
+  //     const { refUserTypeId, refUserFname, refCustId } = users.rows[0];
 
-  //     await client.query(updateHistoryQuery, [
-  //       28,
-  //       tokendata.id,
-  //       `Ground booked successfully`,
+  //     const user = users.rows[0];
+
+  //     // const getDeletedEmployee = await executeQuery(
+  //     //   getDeletedEmployeeCountQuery,params
+  //     // );
+
+  //     // const count = Number(getDeletedEmployee[0]?.count || 0); // safely convert to number
+
+  //     // if (count > 0) {
+  //     //   return encrypt(
+  //     //     {
+  //     //       success: false,
+  //     //       message: "The Person was already deleted",
+  //     //     },
+  //     //     true
+  //     //   );
+  //     // }
+
+  //     if (!user.refCustHashedPassword) {
+  //       console.error("Error: User has no hashed password stored.");
+  //       return encrypt(
+  //         {
+  //           success: false,
+  //           message: "Invalid Login Credentials",
+  //         },
+  //         true
+  //       );
+  //     }
+
+  //     const validPassword = await bcrypt.compare(
+  //       user_data.password,
+  //       user.refCustHashedPassword
+  //     );
+
+  //     if (!validPassword) {
+  //       return encrypt(
+  //         {
+  //           success: false,
+  //           message: "Invalid Login Credentials",
+  //         },
+  //         true
+  //       );
+  //     }
+
+  //     // validPassword === true
+  //     const tokenData = { id: user.refUserId };
+
+  //     const history = [
+  //       2,
+  //       user.refUserId,
+  //       `${user_data.login} login successfully`,
   //       CurrentTime(),
-  //       tokendata.id,
-  //     ]);
+  //       user.refUserId,
+  //     ];
 
-  //     await client.query("COMMIT");
+  //     await client.query(updateHistoryQuery, history);
 
   //     return encrypt(
   //       {
   //         success: true,
-  //         message: "Ground booked successfully",
-  //         result,
-  //         token: tokens,
-  //         totalGroundPrice,
-  //         totalAddonPrice,
-  //         addonPriceDetails,
-  //         refSGSTAmount,
-  //         refCGSTAmount,
-  //         refTotalAmount,
+  //         message: "Login successful",
+  //         userId: user.refUserId,
+  //         roleId: refUserTypeId,
+  //         name: refUserFname,
+  //         custId: refCustId,
+  //         token: generateTokenWithExpire(tokenData, true),
   //       },
   //       true
   //     );
   //   } catch (error) {
-  //     await client.query("ROLLBACK");
-  //     console.error("Booking error:", error);
-
+  //     console.error("Error during login:", error);
   //     return encrypt(
   //       {
   //         success: false,
-  //         message: "Error during booking",
-  //         error: error,
-  //         token: tokens,
+  //         message: "Internal server error",
   //       },
   //       true
   //     );
@@ -546,52 +155,40 @@ export class userRepository {
   //     client.release();
   //   }
   // }
-
   public async loginV1(user_data: any, domain_code?: any): Promise<any> {
     const client: PoolClient = await getClient();
-
     try {
-      const params = [user_data.login];
-      const users: any = await client.query(selectUserByLogin, params);
-      // console.log('users line -------- 31 \n', users)
+      const params = [user_data.login, user_data.roleID];
 
-      if (!users.rows || users.rows.length === 0) {
-        return encrypt(
-          {
-            success: false,
-            message: "Invalid Login Credentials",
-          },
-          true
-        );
+      let user: any;
+
+      if (user_data.roleID === 2) {
+        const usersResult = await client.query(selectUserByLogin, params);
+
+        if (!usersResult.rows || usersResult.rows.length === 0) {
+          return encrypt(
+            { success: false, message: "Invalid Login Credentials" },
+            true
+          );
+        }
+        user = usersResult.rows[0];
+        console.log("user", user);
+      } else {
+        const ownerResult = await client.query(selectOwnerByLogin, params);
+        if (!ownerResult.rows || ownerResult.rows.length === 0) {
+          return encrypt(
+            { success: false, message: "Invalid Login Credentials" },
+            true
+          );
+        }
+        user = ownerResult.rows[0];
+        console.log("user", user);
       }
-
-      const { refUserTypeId, refUserFname, refCustId } = users.rows[0];
-
-      const user = users.rows[0];
-
-      // const getDeletedEmployee = await executeQuery(
-      //   getDeletedEmployeeCountQuery,params
-      // );
-
-      // const count = Number(getDeletedEmployee[0]?.count || 0); // safely convert to number
-
-      // if (count > 0) {
-      //   return encrypt(
-      //     {
-      //       success: false,
-      //       message: "The Person was already deleted",
-      //     },
-      //     true
-      //   );
-      // }
 
       if (!user.refCustHashedPassword) {
         console.error("Error: User has no hashed password stored.");
         return encrypt(
-          {
-            success: false,
-            message: "Invalid Login Credentials",
-          },
+          { success: false, message: "Invalid Login Credentials" },
           true
         );
       }
@@ -600,19 +197,18 @@ export class userRepository {
         user_data.password,
         user.refCustHashedPassword
       );
-
       if (!validPassword) {
         return encrypt(
-          {
-            success: false,
-            message: "Invalid Login Credentials",
-          },
+          { success: false, message: "Invalid Login Credentials" },
           true
         );
       }
 
-      // validPassword === true
-      const tokenData = { id: user.refUserId };
+      // const tokenData = { id: user.refUserId,  };
+      // const tokenData = { id: user.refUserId, roleId: user_data.roleID };
+      
+     const tokenData =  { id: user.refUserId || user.refOwnerId, roleId: user_data.roleID }
+      console.log("tokenData", tokenData);
 
       const history = [
         2,
@@ -621,17 +217,23 @@ export class userRepository {
         CurrentTime(),
         user.refUserId,
       ];
-
       await client.query(updateHistoryQuery, history);
 
       return encrypt(
         {
+          // success: true,
+          // message: "Login successful",
+          // userId: user.refUserId,
+          // roleId: user.refUserTypeId,
+          // name: user.refUserFname,
+          // custId: user.refCustId,
+          // token: generateTokenWithExpire(tokenData, true),
           success: true,
           message: "Login successful",
-          userId: user.refUserId,
-          roleId: refUserTypeId,
-          name: refUserFname,
-          custId: refCustId,
+          userId: user.refUserId || user.refOwnerId,
+          roleId: user.refUserTypeId || user.refOwnerTypeId,
+          name: user_data.roleID === 2 ? user.refUserFname : user.refOwnerFname,
+          custId: user.refCustId || user.refOwnerCustId,
           token: generateTokenWithExpire(tokenData, true),
         },
         true
@@ -639,297 +241,13 @@ export class userRepository {
     } catch (error) {
       console.error("Error during login:", error);
       return encrypt(
-        {
-          success: false,
-          message: "Internal server error",
-        },
+        { success: false, message: "Internal server error" },
         true
       );
     } finally {
       client.release();
     }
   }
-  // public async userGroundBookingV1(
-  //   userData: any,
-  //   tokendata: any
-  // ): Promise<any> {
-  //   const client: PoolClient = await getClient();
-  //   const token = { id: tokendata.id };
-  //   const tokens = generateTokenWithExpire(token, true);
-
-  //   const parseDMY = (dateStr: string): Date => {
-  //     const [day, month, year] = dateStr.split("-").map(Number);
-  //     return new Date(year, month - 1, day);
-  //   };
-
-  //   const formatDMY = (date: Date): string => {
-  //     return `${String(date.getDate()).padStart(2, "0")}-${String(
-  //       date.getMonth() + 1
-  //     ).padStart(2, "0")}-${date.getFullYear()}`;
-  //   };
-
-  //   const generateDateRange = (start: string, end: string): string[] => {
-  //     const result: string[] = [];
-  //     const currentDate = parseDMY(start);
-  //     const stopDate = parseDMY(end);
-  //     while (currentDate <= stopDate) {
-  //       result.push(formatDMY(currentDate));
-  //       currentDate.setDate(currentDate.getDate() + 1);
-  //     }
-  //     return result;
-  //   };
-
-  //   try {
-  //     await client.query("BEGIN");
-
-  //     const {
-  //       refGroundId,
-  //       isAddonNeeded = false,
-  //       refBookingTypeId,
-  //       refBookingStartDate,
-  //       refBookingEndDate,
-  //       refStartTime,
-  //       refEndTime,
-  //       additionalNotes = "",
-  //       refAddOns = [],
-  //     } = userData;
-
-  //     if (!refGroundId || !refBookingTypeId || !refBookingStartDate) {
-  //       throw new Error("Required booking details are missing.");
-  //     }
-
-  //     const endDate = refBookingTypeId === 1 ? refBookingEndDate : null;
-  //     const refAddOnsId =
-  //       isAddonNeeded && refAddOns.length > 0
-  //         ? `{${refAddOns.map((a: any) => a.refAddOnsId).join(",")}}`
-  //         : null;
-
-  //     // Preload all addon, subaddon, and item prices to minimize DB calls
-  //     // Extract all IDs needed from userData
-  //     const addonIds = refAddOns.map((a: any) => a.refAddOnsId);
-  //     const subaddonIds: number[] = [];
-  //     const itemIds: number[] = [];
-
-  //     for (const addon of refAddOns) {
-  //       if (addon.isSubaddonNeeded && Array.isArray(addon.refSubaddons)) {
-  //         for (const subaddon of addon.refSubaddons) {
-  //           subaddonIds.push(subaddon.refSubaddonId);
-  //           if (subaddon.isItemsNeeded && Array.isArray(subaddon.refItems)) {
-  //             for (const item of subaddon.refItems) {
-  //               itemIds.push(item.refItemsId);
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-
-  //     // Bulk fetch prices
-  //     const { rows: addonPriceRows } = await client.query(
-  //       `
-  //       SELECT "refAddOnsId", "refAddonPrice"
-  //       FROM public."refAddOns"
-  //       WHERE "refGroundId" = $1 AND "refAddOnsId" = ANY($2::int[])
-  //       `,
-  //       [refGroundId, addonIds.length > 0 ? addonIds : [-1]]
-  //     );
-
-  //     const { rows: subaddonPriceRows } = await client.query(
-  //       `
-  //       SELECT "subAddOnsId", "refSubAddOnPrice"
-  //       FROM public."subAddOns"
-  //       WHERE "refGroundId" = $1 AND "subAddOnsId" = ANY($2::int[])
-  //       `,
-  //       [refGroundId, subaddonIds.length > 0 ? subaddonIds : [-1]]
-  //     );
-
-  //     const { rows: itemPriceRows } = await client.query(
-  //       `
-  //       SELECT "refItemsId", "refItemsPrice"
-  //       FROM public."refItems"
-  //       WHERE "refGroundId" = $1 AND "refItemsId" = ANY($2::int[])
-  //       `,
-  //       [refGroundId, itemIds.length > 0 ? itemIds : [-1]]
-  //     );
-
-  //     // Create lookup maps for quick price access
-  //     const addonPriceMap = new Map<number, number>();
-  //     addonPriceRows.forEach((r) => addonPriceMap.set(r.refAddOnsId, Number(r.refAddonPrice)));
-
-  //     const subaddonPriceMap = new Map<number, number>();
-  //     subaddonPriceRows.forEach((r) => subaddonPriceMap.set(r.subAddOnsId, Number(r.refSubAddOnPrice)));
-
-  //     const itemPriceMap = new Map<number, number>();
-  //     itemPriceRows.forEach((r) => itemPriceMap.set(r.refItemsId, Number(r.refItemsPrice)));
-
-  //     // Calculate total ground price
-  //     const groundPriceRes:any = await client.query(
-  //       `SELECT "refGroundPrice" FROM public."refGround" WHERE "refGroundId" = $1`,
-  //       [refGroundId]
-  //     );
-  //     const refGroundPrice = Number(groundPriceRes.rows[0]?.refGroundPrice || 0);
-
-  //     const dateList =
-  //       refBookingTypeId === 1 && refBookingEndDate
-  //         ? generateDateRange(refBookingStartDate, refBookingEndDate)
-  //         : [refBookingStartDate];
-
-  //     const totalGroundPrice = dateList.length * refGroundPrice;
-
-  //     // Calculate total addon price
-  //     let totalAddonPrice = 0;
-  //     const addonPriceDetails: any[] = [];
-
-  //     if (isAddonNeeded && refAddOns.length > 0) {
-  //       for (const addon of refAddOns) {
-  //         const {
-  //           refAddOnsId,
-  //           selectedDates = [],
-  //           refPersonCount = 1,
-  //           isSubaddonNeeded = false,
-  //           refSubaddons = [],
-  //         } = addon;
-
-  //         let addonTotal = 0;
-
-  //         for (const date of selectedDates) {
-  //           let dailyAddonTotal = 0;
-
-  //           if (isSubaddonNeeded) {
-  //             for (const sub of refSubaddons) {
-  //               const {
-  //                 refSubaddonId,
-  //                 isItemsNeeded = false,
-  //                 refItems = [],
-  //               } = sub;
-
-  //               if (isItemsNeeded && refItems.length > 0) {
-  //                 for (const item of refItems) {
-  //                   if (itemPriceMap.has(item.refItemsId)) {
-  //                     dailyAddonTotal += itemPriceMap.get(item.refItemsId)! * refPersonCount;
-  //                   } else if (subaddonPriceMap.has(refSubaddonId)) {
-  //                     dailyAddonTotal += subaddonPriceMap.get(refSubaddonId)! * refPersonCount;
-  //                   } else if (addonPriceMap.has(refAddOnsId)) {
-  //                     dailyAddonTotal += addonPriceMap.get(refAddOnsId)! * refPersonCount;
-  //                   }
-  //                 }
-  //               } else {
-  //                 if (subaddonPriceMap.has(refSubaddonId)) {
-  //                   dailyAddonTotal += subaddonPriceMap.get(refSubaddonId)! * refPersonCount;
-  //                 }
-  //               }
-  //             }
-  //           } else {
-  //             if (addonPriceMap.has(refAddOnsId)) {
-  //               dailyAddonTotal += addonPriceMap.get(refAddOnsId)! * refPersonCount;
-  //             }
-  //           }
-
-  //           addonTotal += dailyAddonTotal;
-  //           totalAddonPrice += dailyAddonTotal;
-  //         }
-
-  //         addonPriceDetails.push({
-  //           refAddOnsId,
-  //           selectedDates,
-  //           isSubaddonNeeded,
-  //           refPersonCount,
-  //           addonAmount: addonTotal,
-  //         });
-  //       }
-  //     }
-
-  //     // Calculate GST and total
-  //     const subtotal = totalGroundPrice + totalAddonPrice;
-  //     const refSGSTAmount = +(subtotal * 0.09).toFixed(2);
-  //     const refCGSTAmount = +(subtotal * 0.09).toFixed(2);
-  //     const refTotalAmount = subtotal + refSGSTAmount + refCGSTAmount;
-
-  //     // Insert booking data
-  //     const bookingParams = [
-  //       tokendata.id,
-  //       refGroundId,
-  //       refBookingTypeId,
-  //       refAddOnsId,
-  //       refBookingStartDate,
-  //       endDate,
-  //       refStartTime,
-  //       refEndTime,
-  //       additionalNotes,
-  //       refTotalAmount,
-  //       CurrentTime(),
-  //       tokendata.id,
-  //       totalGroundPrice,
-  //       refSGSTAmount,
-  //       refCGSTAmount,
-  //       userData.transactionId,
-  //     ];
-
-  //     const result = await client.query(adduserBookingQuery, bookingParams);
-
-  //     // Add-on unavailability entries
-  //     if (isAddonNeeded) {
-  //       for (const addon of refAddOns) {
-  //         for (const date of addon.selectedDates || []) {
-  //           await client.query(
-  //             `INSERT INTO public."addOnUnAvailability" (
-  //               "unAvailabilityDate", "refAddOnsId", "refGroundId", "createdAt", "createdBy", "refAddOnsPrice"
-  //             ) VALUES ($1, $2, $3, $4, $5, $6)`,
-  //             [
-  //               date,
-  //               addon.refAddOnsId,
-  //               refGroundId,
-  //               CurrentTime(),
-  //               tokendata.id,
-  //               0,
-  //             ]
-  //           );
-  //         }
-  //       }
-  //     }
-
-  //     // Ground booking unavailability
-  //     for (const date of dateList) {
-  //       await client.query(
-  //         `INSERT INTO public."addOnUnAvailability" (
-  //           "unAvailabilityDate", "refAddOnsId", "refGroundId", "createdAt", "createdBy", "refAddOnsPrice"
-  //         ) VALUES ($1, $2, $3, $4, $5, $6)`,
-  //         [date, 1, refGroundId, CurrentTime(), tokendata.id, 0] // 1 is default for ground
-  //       );
-  //     }
-  //       const deletestorage = await client.query(deletestorageQuery, [
-  //         tokendata.id,
-  //       ]);
-  //       console.log("deletestorage", deletestorage);
-  //     await client.query("COMMIT");
-
-  //     return {
-  //       message: "Ground Booking Completed Successfully",
-  //       result: result.rows,
-  //       tokens,
-  //       refTotalAmount,
-  //       totalGroundPrice,
-  //       totalAddonPrice,
-  //       addonPriceDetails,
-  //       refSGSTAmount,
-  //       refCGSTAmount,
-  //     };
-  //     } catch (error) {
-  //       await client.query("ROLLBACK");
-  //       console.error("Booking error:", error);
-
-  //       return encrypt(
-  //         {
-  //           success: false,
-  //           message: "Error during booking",
-  //           error: error,
-  //           token: tokens,
-  //         },
-  //         true
-  //       );
-  //     } finally {
-  //       client.release();
-  //     }
-  //   }
 
   public async userGroundBookingV1(
     userData: any,
@@ -1254,12 +572,12 @@ export class userRepository {
 
     try {
       const { refSportsCategoryId } = userData;
-      
+
       const result = await executeQuery(listFiletedGroundsQuery, [
         refSportsCategoryId,
       ]);
 
-         for (const product of result) {
+      for (const product of result) {
         if (product.refGroundImage) {
           try {
             const fileBuffer = await viewFile(product.refGroundImage);
@@ -2443,9 +1761,9 @@ export class userRepository {
       // console.log(bookingAmount + "---->>>>>>>>>");
 
       const refGroundPrice = Number(groundPriceRows[0].refGroundPrice);
-      console.log('refGroundPrice', refGroundPrice)
+      console.log("refGroundPrice", refGroundPrice);
       const refTournamentPrice = Number(groundPriceRows[0].refTournamentPrice);
-      console.log('refTournamentPrice', refTournamentPrice)
+      console.log("refTournamentPrice", refTournamentPrice);
 
       const dateList = generateDateRange(
         userData.refBookingStartDate,
@@ -2453,10 +1771,10 @@ export class userRepository {
       );
 
       const actualGroundPrice =
-      dateList.length > 1 ? refTournamentPrice : refGroundPrice;
+        dateList.length > 1 ? refTournamentPrice : refGroundPrice;
       const totalGroundPrice = dateList.length * actualGroundPrice;
       const bookingAmount = totalGroundPrice;
-      console.log('actualGroundPrice', actualGroundPrice)
+      console.log("actualGroundPrice", actualGroundPrice);
       // 5. GST calculations (9% SGST + 9% CGST)
       const resSGSTAmount = (bookingAmount + totalAddonAmount) * 0.09;
       const refCGSTAmount = (bookingAmount + totalAddonAmount) * 0.09;

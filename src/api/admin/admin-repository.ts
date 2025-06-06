@@ -15,17 +15,23 @@ import {
 
 import { CurrentTime } from "../../helper/common";
 import {
+  approveGroundQuery,
+  approveGrounNamedQuery,
   checkEmailQuery,
   checkMobileQuery,
   deleteUserBookingQuery,
   getLastCustomerIdQuery,
+  groundAuditQuery,
   insertUserDomainQuery,
   insertUserQuery,
+  listAdmindashboardQuery,
+  listAllUserBookingsQuery,
   listdashboardQuery,
   listOverallAuditQuery,
   listReportQuery,
   listSignUpUserQuery,
   listUserBookingsQuery,
+  ownerStatusAuditQuery,
   selectUserByLogin,
   updateHistoryQuery,
 } from "./query";
@@ -170,7 +176,6 @@ export class adminRepository {
 
       const params = [user_data.login];
       const users: any = await client.query(selectUserByLogin, params);
-      // console.log('users line -------- 31 \n', users)
 
       if (!users.rows || users.rows.length === 0) {
         return encrypt(
@@ -185,22 +190,6 @@ export class adminRepository {
       const { refUserTypeId } = users.rows[0];
 
       const user = users.rows[0];
-
-      // const getDeletedEmployee = await executeQuery(
-      //   getDeletedEmployeeCountQuery,params
-      // );
-
-      // const count = Number(getDeletedEmployee[0]?.count || 0); // safely convert to number
-
-      // if (count > 0) {
-      //   return encrypt(
-      //     {
-      //       success: false,
-      //       message: "The Person was already deleted",
-      //     },
-      //     true
-      //   );
-      // }
 
       if (!user.refCustHashedPassword) {
         console.error("Error: User has no hashed password stored.");
@@ -303,6 +292,7 @@ export class adminRepository {
   //     );
   //   }
   // }
+
   public async listUserBookingsV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
@@ -310,7 +300,13 @@ export class adminRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listUserBookingsQuery, [tokendata.id]);
+      let result;
+
+      if (tokendata.roleId !== 1) {
+        result = await executeQuery(listUserBookingsQuery, [tokendata.id]);
+      } else {
+        result = await executeQuery(listAllUserBookingsQuery);
+      }
 
       const parsedPayloadArray = [];
 
@@ -324,6 +320,7 @@ export class adminRepository {
           record.payload = null; // Optional: mark as null or handle differently
         }
       }
+
       return encrypt(
         {
           success: true,
@@ -517,8 +514,14 @@ export class adminRepository {
     const tokens = generateTokenWithExpire(token, true);
 
     try {
-      const result = await executeQuery(listdashboardQuery);
+      // const result = await executeQuery(listdashboardQuery);
+      let result;
 
+      if (tokendata.roleId !== 1) {
+        result = await executeQuery(listdashboardQuery, [tokendata.id]);
+      } else {
+        result = await executeQuery(listAdmindashboardQuery);
+      }
       return encrypt(
         {
           success: true,
@@ -535,6 +538,110 @@ export class adminRepository {
         {
           success: false,
           message: "An error occurred while list dashboardV1",
+          token: tokens,
+          error: String(error),
+        },
+        true
+      );
+    }
+  }
+  public async approveGroundV1(userData: any, tokendata: any): Promise<any> {
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
+    const tokens = generateTokenWithExpire(token, true);
+    const client: PoolClient = await getClient();
+
+    try {
+      await client.query("BEGIN"); // Start transaction
+
+      const { refGroundId, status } = userData;
+      const result = await client.query(approveGroundQuery, [
+        refGroundId,
+        status,
+        // CurrentTime(),
+        // tokendata.id,
+      ]);
+
+      const name = await executeQuery(approveGrounNamedQuery, [refGroundId]);
+      console.log("name", name);
+      const groundName = name[0].refGroundName;
+      console.log("groundName", groundName);
+
+      // if (result.rowCount === 0) {
+      //   await client.query("ROLLBACK");
+      //   return encrypt(
+      //     {
+      //       success: false,
+      //       message: "booking not found or already deleted",
+      //       token: tokens,
+      //     },
+      //     true
+      //   );
+      // }
+
+      const history = [
+        40, // Unique ID for delete action
+        tokendata.id,
+        `${groundName} Ground ${status} Successfully`,
+        CurrentTime(),
+        tokendata.id,
+      ];
+
+      await client.query(updateHistoryQuery, history);
+      await client.query("COMMIT"); // Commit transaction
+
+      return encrypt(
+        {
+          success: true,
+          message: "ground Approved successfully",
+          token: tokens,
+          result: result.rows[0], // Return deleted record for reference
+        },
+        true
+      );
+    } catch (error: unknown) {
+      await client.query("ROLLBACK"); // Rollback on error
+      console.error("Error ground Approved", error);
+
+      return encrypt(
+        {
+          success: false,
+          message: "An error occurred while ground Approved",
+          token: tokens,
+          error: String(error),
+        },
+        true
+      );
+    } finally {
+      client.release();
+    }
+  }
+  public async ownerAuditV1(userData: any, tokendata: any): Promise<any> {
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+
+    const tokens = generateTokenWithExpire(token, true);
+
+    try {
+      const result = await executeQuery(ownerStatusAuditQuery);
+      const groundAudit = await executeQuery(groundAuditQuery);
+   
+      return encrypt(
+        {
+          success: true,
+          message: "list ownerAudit listed successfully",
+          token: tokens,
+          result: result, // Return deleted record for reference
+        },
+        true
+      );
+    } catch (error: unknown) {
+      console.error("Error list list ownerAudit", error);
+
+      return encrypt(
+        {
+          success: false,
+          message: "An error occurred while list ownerAudit",
           token: tokens,
           error: String(error),
         },

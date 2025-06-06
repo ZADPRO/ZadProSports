@@ -123,6 +123,34 @@ WHERE
   ub."refUserBookingId" DESC;
 `;
 
+export const listAllUserBookingsQuery = `
+SELECT
+  ub.*,
+  ts.payload,
+  ts."bookingAmount",
+  ts."addonsAmount",
+  ts."resSGSTAmount",
+  ts."refCGSTAmount",
+  ts."totalAmount",
+  rg."refGroundName",
+  rg."refGroundCustId",
+  u."refCustId",
+  u."refUserFname",
+  u."refUserLname",
+  ud."refMobileNumber",
+  ud."refEmail"
+FROM
+  public."refUserBooking" ub
+  LEFT JOIN public."tempStorage" ts ON CAST(ts."tempStorageId" AS INTEGER) = ub."tempStorageId"
+  LEFT JOIN public."refGround" rg ON CAST(rg."refGroundId" AS INTEGER) = ub."refGroundId"
+  LEFT JOIN public."users" u ON CAST(u."refuserId" AS INTEGER) = ub."refUserId"
+  LEFT JOIN public."refUsersDomain" ud ON CAST(ud."refUserId" AS INTEGER) = ub."refUserId"
+WHERE
+  ub."isDelete" IS NOT true 
+    ORDER BY
+  ub."refUserBookingId" DESC;
+`;
+
 // export const listUserBookingsQuery = `
 // SELECT
 //   ub.*,
@@ -277,3 +305,82 @@ SELECT
      rg."isDelete" IS NOT true AND u."refUserTypeId" = '3'
   ) AS "GroundCount"
 `;
+
+export const listAdmindashboardQuery = `
+SELECT
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      public."refUserBooking" ub
+    WHERE
+      ub."isDelete" IS NOT true
+  ) AS "BookingCount",
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      public."refGround" rg
+    WHERE
+      rg."isDelete" IS NOT true
+  ) AS "GroundCount",
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      public."users" u
+    WHERE
+      u."isDelete" IS NOT true
+      AND u."refCustId" LIKE 'CGA-CUS-%'
+  ) AS "UsersCount",
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      public."users" u
+    WHERE
+      u."isDelete" IS NOT true
+      AND u."refCustId" LIKE 'CGA-OWN-%'
+  ) AS "OwnerCount"
+`;
+
+
+export const approveGroundQuery = `
+UPDATE
+  public."refGround"
+SET
+  "approveGround" = $2
+WHERE
+  "refGroundId" = $1
+RETURNING
+  *;
+`;
+
+export const approveGrounNamedQuery = `
+SELECT
+  "refGroundName"
+FROM
+  public."refGround"
+WHERE
+  "refGroundId" = $1
+`
+;
+
+export const ownerStatusAuditQuery = `
+SELECT
+  *
+FROM
+  public."refTxnHistory"
+WHERE
+  "refTransactionTypeId" = '39';
+`
+;
+export const groundAuditQuery = `
+SELECT
+  *
+FROM
+  public."refTxnHistory"
+WHERE
+  "refTransactionTypeId" = '40';
+`
+;

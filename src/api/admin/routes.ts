@@ -101,6 +101,28 @@ export class adminRoutes implements IRoute {
             auth: false,
           },
         },
+         {
+          method: "POST",
+          path: "/api/v1/adminRoutes/approveGround",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.approveGround,
+            description: "approveGround",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
+         {
+          method: "GET",
+          path: "/api/v1/adminRoutes/ownerAudit",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.ownerAudit,
+            description: "ownerAudit",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
       ]);
       resolve(true);
     });

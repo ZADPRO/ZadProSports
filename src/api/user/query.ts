@@ -164,10 +164,10 @@ FROM
     )::INTEGER[]
   )
 WHERE
-  rg."isDelete" IS NOT true
+  rg."isDelete" IS NOT true AND rg."approveGround" = 'Approved'
 GROUP BY
   rg."refGroundId";
-`;
+  `;
 
 export const listFreeGroundsQuery = `
 SELECT
@@ -492,7 +492,20 @@ WHERE
     ud."refEmail" = $1
     OR ud."refUserName" = $1
   )
+  AND u."refUserTypeId" = '2'
   AND u."isDelete" IS NOT true
+`;
+
+
+export const selectOwnerByLogin =`
+SELECT
+  o.*
+FROM
+  public."owners" o
+WHERE
+  o."refEmailId" = $1
+  AND o."refUserTypeId" = $2
+  AND o."isDelete" IS NOT true
 `;
 
 export const getGroundsQuery = `

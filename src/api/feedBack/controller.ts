@@ -3,7 +3,7 @@ import * as Boom from "@hapi/boom";
 
 import logger from "../../helper/logger";
 
-import { decodeToken } from "../../helper/token"
+import { decodeToken } from "../../helper/token";
 import { feedBackResolver } from "./resolver";
 
 export class feedbackController {
@@ -12,16 +12,18 @@ export class feedbackController {
   constructor() {
     this.resolver = new feedBackResolver();
   }
-  
+
   public addFeedBack = async (
     request: any,
     response: Hapi.ResponseToolkit
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
+
       let entity;
       entity = await this.resolver.addFeedBackV1(request.payload, decodedToken);
 
@@ -29,9 +31,8 @@ export class feedbackController {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in add feedback" , error);
+      logger.error("Error in add feedback", error);
       return response
         .response({
           success: false,
@@ -49,19 +50,22 @@ export class feedbackController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.listFeedBackV1(request.payload, decodedToken);
+      entity = await this.resolver.listFeedBackV1(
+        request.payload,
+        decodedToken
+      );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in list feedback" , error);
+      logger.error("Error in list feedback", error);
       return response
         .response({
           success: false,
@@ -79,19 +83,22 @@ export class feedbackController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.groundFeedBackV1(request.payload, decodedToken);
+      entity = await this.resolver.groundFeedBackV1(
+        request.payload,
+        decodedToken
+      );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in ground feedback" , error);
+      logger.error("Error in ground feedback", error);
       return response
         .response({
           success: false,
@@ -109,19 +116,22 @@ export class feedbackController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.userFeedBackHistoryV1(request.payload, decodedToken);
+      entity = await this.resolver.userFeedBackHistoryV1(
+        request.payload,
+        decodedToken
+      );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in user FeedBack History" , error);
+      logger.error("Error in user FeedBack History", error);
       return response
         .response({
           success: false,
@@ -133,5 +143,4 @@ export class feedbackController {
         .code(500);
     }
   };
-
 }

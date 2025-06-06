@@ -5,6 +5,7 @@ export default {
     payload: Joi.object({
       login: Joi.string().required(),
       password: Joi.string().required(),
+      roleID:Joi.number().integer().required(),
     }),
     headers: Joi.object({
       authorization: Joi.string().optional(),

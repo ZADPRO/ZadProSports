@@ -5,6 +5,7 @@ import { groundRoutes } from "./api/ground/routes";
 import { userRoutes } from "./api/user/routes";
 import { feedbackRoutes } from "./api/feedBack/routes";
 import { ownerRoutes } from "./api/owner/routes";
+import { financeRoutes } from "./api/finance/routes";
 
 
 export default class Router {
@@ -15,6 +16,7 @@ export default class Router {
     await new userRoutes().register(server);
     await new feedbackRoutes().register(server);
     await new ownerRoutes().register(server);
+    await new financeRoutes().register(server);
 
   }
 }

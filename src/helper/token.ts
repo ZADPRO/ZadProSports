@@ -29,21 +29,21 @@ function generateTokenWithExpire(
   }
 }
 
-const FIVE_MINUTES_EXPIRATION = "5m";
+// const FIVE_MINUTES_EXPIRATION = "5m";
 
-export function generateTokenWith5MExpire(
-  tokenData: object,
-  action: boolean
-): string | object {
-  if (action) {
-    const token = jwt.sign(tokenData, process.env.ACCESS_TOKEN as string, {
-      expiresIn: FIVE_MINUTES_EXPIRATION,
-    });
-    return token;
-  } else {
-    return tokenData;
-  }
-}
+// export function generateTokenWith5MExpire(
+//   tokenData: object,
+//   action: boolean
+// ): string | object {
+//   if (action) {
+//     const token = jwt.sign(tokenData, process.env.ACCESS_TOKEN as string, {
+//       expiresIn: FIVE_MINUTES_EXPIRATION,
+//     });
+//     return token;
+//   } else {
+//     return tokenData;
+//   }
+// }
 
 // WITHOUT TOKEN EXPIRATION
 function generateTokenWithoutExpire(
@@ -78,7 +78,43 @@ function decodeToken(token: string): JwtPayload | { error: string } {
 
 // VALIDATE TOKEN
 
+// function validateToken(request: any, h: ResponseToolkit) {
+//   console.log("request", request);
+//   const authHeader = request.headers.authorization;
+//   console.log("authHeader line ----- 66  \n \n", authHeader);
+
+//   if (!authHeader) {
+//     return h.response({ error: "Token missing" }).code(401).takeover();
+//   }
+//   const token = authHeader.split(" ")[1];
+//   console.log("token", token);
+//   const decodedToken = decodeToken(token);
+//   console.log("decodedToken", decodedToken);
+
+//   if ("error" in decodeToken) {
+//     return h
+//       .response(
+//         encrypt(
+//           {
+//             token: false,
+//             message: decodedToken.error,
+//           },
+//           true
+//         )
+//       )
+//       .code(200)
+//       .takeover();
+//   }
+
+//   request.plugins.token = decodedToken;
+//   console.log("request.plugins.token", request.plugins.token);
+
+//   return h.continue;
+// }
+
 function validateToken(request: any, h: ResponseToolkit) {
+  console.log("request", request);
+
   const authHeader = request.headers.authorization;
   console.log("authHeader line ----- 66  \n \n", authHeader);
 
@@ -88,16 +124,27 @@ function validateToken(request: any, h: ResponseToolkit) {
 
   const token = authHeader.split(" ")[1];
   console.log("token", token);
+
   const decodedToken = decodeToken(token);
   console.log("decodedToken", decodedToken);
 
-  if ("error" in decodeToken) {
+  // Check for error in decoded token
+  if (
+    !decodedToken ||
+    typeof decodedToken !== "object" ||
+    "error" in decodedToken
+  ) {
+    const errorMessage =
+      typeof decodedToken === "object" && decodedToken?.error
+        ? decodedToken.error
+        : "Invalid or expired token";
+
     return h
       .response(
         encrypt(
           {
             token: false,
-            message: decodedToken.error,
+            message: errorMessage,
           },
           true
         )
@@ -106,11 +153,13 @@ function validateToken(request: any, h: ResponseToolkit) {
       .takeover();
   }
 
+  // Assign decoded token only if it's valid
   request.plugins.token = decodedToken;
   console.log("request.plugins.token", request.plugins.token);
 
   return h.continue;
 }
+
 function validateTokenwithRole(request: any, h: ResponseToolkit) {
   const authHeader = request.headers.authorization;
   console.log("authHeader line ----- 66  \n \n", authHeader);

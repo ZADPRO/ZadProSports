@@ -34,9 +34,11 @@ export const storeFile = async (
 
     uploadDir = path.join(process.cwd(), "./src/assets/foodImage");
   } else if (uploadType === 2) {
-    uploadDir = path.join(process.cwd(), "./src/assets/roomImage");
+    uploadDir = path.join(process.cwd(), "./src/assets/ownerGroundImage");
   } else if (uploadType === 3) {
     uploadDir = path.join(process.cwd(), "./src/assets/groundImage");
+  } else if (uploadType === 4) {
+    uploadDir = path.join(process.cwd(), "./src/assets/ownerDocuments");
   } else {
     throw new Error(`Invalid upload type: ${uploadType}. `);
   }
