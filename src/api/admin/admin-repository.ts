@@ -632,6 +632,7 @@ export class adminRepository {
           message: "list ownerAudit listed successfully",
           token: tokens,
           result: result, // Return deleted record for reference
+          groundAudit:groundAudit
         },
         true
       );

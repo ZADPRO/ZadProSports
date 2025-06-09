@@ -146,6 +146,8 @@ VALUES
       client.release();
     }
   }
+
+  //update paid status
   public async getWeeklyPayoutsV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id, roleId: tokendata.roleId };
     const tokens = generateTokenWithExpire(token, true);
