@@ -64,12 +64,9 @@ export const insertUnavailableQuery = `
             VALUES ($1, $2, $3, $4, $5)
           `;
 
-
-
 export const getGroundAmtQuery = `
 
 `;
-
 
 export const listFiletedGroundsQuery = `
 SELECT
@@ -246,7 +243,6 @@ WHERE
 
 `;
 
-
 export const updateUserDataQuery = `
 UPDATE
   public."users"
@@ -382,7 +378,6 @@ WHERE
   ub."refUserBookingId" DESC;
   `;
 
-
 // export const listUserBookingHistoryQuery = `
 // SELECT
 //   ub.*,
@@ -466,7 +461,6 @@ WHERE
 //   ub."refUserBookingId" DESC;
 //   `;
 
-
 export const listUserAuditPageQuery = `
 SELECT
   *
@@ -488,16 +482,14 @@ FROM
   public."users" u
   LEFT JOIN public."refUsersDomain" ud ON CAST(ud."refUserId" AS INTEGER) = u."refuserId"
 WHERE
-  (
+  
     ud."refEmail" = $1
-    OR ud."refUserName" = $1
-  )
-  AND u."refUserTypeId" = '2'
+  
+  AND u."refUserTypeId" = $2
   AND u."isDelete" IS NOT true
 `;
 
-
-export const selectOwnerByLogin =`
+export const selectOwnerByLogin = `
 SELECT
   o.*
 FROM
@@ -692,7 +684,6 @@ WHERE
   AND i."refGroundId" = $1
 `;
 
-
 export const getconvertedDataAmountQuery = `
 SELECT *
 FROM public."tempStorage"
@@ -701,7 +692,6 @@ WHERE
   AND "isDelete" IS NOT true
   AND NOW() BETWEEN "createdAt"::timestamptz AND ("createdAt"::timestamptz + INTERVAL '5 minutes');
 `;
-
 
 export const deletestorageQuery = `
 UPDATE

@@ -3,7 +3,7 @@ import * as Boom from "@hapi/boom";
 
 import logger from "../../helper/logger";
 
-import { decodeToken } from "../../helper/token"
+import { decodeToken } from "../../helper/token";
 import { userResolver } from "./resolver";
 
 export class userController {
@@ -22,7 +22,8 @@ export class userController {
       //   id:request.plugins.token.id
       // }
       let entity;
-      entity = await this.resolver.loginV1(request.payload
+      entity = await this.resolver.loginV1(
+        request.payload
         // ,decodedToken
       );
 
@@ -30,9 +31,8 @@ export class userController {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in user login" , error);
+      logger.error("Error in user login", error);
       return response
         .response({
           success: false,
@@ -50,19 +50,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.userGroundBookingV1(request.payload,decodedToken);
+      entity = await this.resolver.userGroundBookingV1(
+        request.payload,
+        decodedToken
+      );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in user Ground Booking" , error);
+      logger.error("Error in user Ground Booking", error);
       return response
         .response({
           success: false,
@@ -80,19 +83,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.listFilteredGroundsV1(request.payload,decodedToken);
+      entity = await this.resolver.listFilteredGroundsV1(
+        request.payload,
+        decodedToken
+      );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in listing filtered Grounds" , error);
+      logger.error("Error in listing filtered Grounds", error);
       return response
         .response({
           success: false,
@@ -110,19 +116,19 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.listGroundsV1(request.payload,decodedToken);
+      entity = await this.resolver.listGroundsV1(request.payload, decodedToken);
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in listing  Grounds" , error);
+      logger.error("Error in listing  Grounds", error);
       return response
         .response({
           success: false,
@@ -140,19 +146,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.listFreeGroundsV1(request.payload,decodedToken);
+      entity = await this.resolver.listFreeGroundsV1(
+        request.payload,
+        decodedToken
+      );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in listing free Grounds" , error);
+      logger.error("Error in listing free Grounds", error);
       return response
         .response({
           success: false,
@@ -170,19 +179,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.listProfileDataV1(request.payload,decodedToken);
+      entity = await this.resolver.listProfileDataV1(
+        request.payload,
+        decodedToken
+      );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in listing profile data" , error);
+      logger.error("Error in listing profile data", error);
       return response
         .response({
           success: false,
@@ -200,19 +212,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.updateProfileDataV1(request.payload,decodedToken);
+      entity = await this.resolver.updateProfileDataV1(
+        request.payload,
+        decodedToken
+      );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in update profile data" , error);
+      logger.error("Error in update profile data", error);
       return response
         .response({
           success: false,
@@ -234,7 +249,8 @@ export class userController {
       //   id:request.plugins.token.id
       // }
       let entity;
-      entity = await this.resolver.forgotPasswordV1(request.payload
+      entity = await this.resolver.forgotPasswordV1(
+        request.payload
         // ,decodedToken
       );
 
@@ -242,9 +258,8 @@ export class userController {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in forgot Password" , error);
+      logger.error("Error in forgot Password", error);
       return response
         .response({
           success: false,
@@ -262,21 +277,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.resetPasswordV1(request.payload
-        ,decodedToken
+      entity = await this.resolver.resetPasswordV1(
+        request.payload,
+        decodedToken
       );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in reset Password" , error);
+      logger.error("Error in reset Password", error);
       return response
         .response({
           success: false,
@@ -294,21 +310,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.userBookingHistoryV1(request.payload
-        ,decodedToken
+      entity = await this.resolver.userBookingHistoryV1(
+        request.payload,
+        decodedToken
       );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in user Booking History" , error);
+      logger.error("Error in user Booking History", error);
       return response
         .response({
           success: false,
@@ -326,21 +343,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.userAuditPageV1(request.payload
-        ,decodedToken
+      entity = await this.resolver.userAuditPageV1(
+        request.payload,
+        decodedToken
       );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in user Audit History" , error);
+      logger.error("Error in user Audit History", error);
       return response
         .response({
           success: false,
@@ -358,21 +376,19 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.getGroundsV1(request.payload
-        ,decodedToken
-      );
+      entity = await this.resolver.getGroundsV1(request.payload, decodedToken);
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in getGrounds" , error);
+      logger.error("Error in getGrounds", error);
       return response
         .response({
           success: false,
@@ -390,21 +406,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.getUnavailableAddonsV1(request.payload
-        ,decodedToken
+      entity = await this.resolver.getUnavailableAddonsV1(
+        request.payload,
+        decodedToken
       );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in getUnavailableAddons" , error);
+      logger.error("Error in getUnavailableAddons", error);
       return response
         .response({
           success: false,
@@ -422,21 +439,21 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+      };
       let entity;
-      entity = await this.resolver.payConvertStringV1(request.payload
-        ,decodedToken
+      entity = await this.resolver.payConvertStringV1(
+        request.payload,
+        decodedToken
       );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in payConvertString" , error);
+      logger.error("Error in payConvertString", error);
       return response
         .response({
           success: false,
@@ -454,21 +471,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.getconvertedDataAmountV1(request.payload
-        ,decodedToken
+      entity = await this.resolver.getconvertedDataAmountV1(
+        request.payload,
+        decodedToken
       );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in getconvertedDataAmount" , error);
+      logger.error("Error in getconvertedDataAmount", error);
       return response
         .response({
           success: false,
@@ -486,21 +504,22 @@ export class userController {
   ): Promise<any> => {
     logger.info(`GET URL REQ => ${request.url.href}`);
     try {
-      const decodedToken ={
-        id:request.plugins.token.id
-      }
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
       let entity;
-      entity = await this.resolver.listSportCategoryV1(request.payload
-        ,decodedToken
+      entity = await this.resolver.listSportCategoryV1(
+        request.payload,
+        decodedToken
       );
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
-
     } catch (error) {
-      logger.error("Error in listSportCategory" , error);
+      logger.error("Error in listSportCategory", error);
       return response
         .response({
           success: false,
@@ -512,5 +531,4 @@ export class userController {
         .code(500);
     }
   };
-
 }

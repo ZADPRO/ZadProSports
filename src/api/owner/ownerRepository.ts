@@ -240,6 +240,7 @@ export class ownerRepository {
   //     client.release();
   //   }
   // }
+
   public async addOwnersV1(userData: any, token_data?: any): Promise<any> {
     const client: PoolClient = await getClient();
 
@@ -729,6 +730,7 @@ export class ownerRepository {
   }
   public async getOwnersV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -805,6 +807,7 @@ export class ownerRepository {
     tokendata: any
   ): Promise<any> {
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -1030,9 +1033,11 @@ export class ownerRepository {
   //     client.release();
   //   }
   // }
+
   public async updateOwnersV1(userData: any, token_data?: any): Promise<any> {
     const client: PoolClient = await getClient();
     const token = { id: token_data.id, roleId: token_data.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -1230,6 +1235,7 @@ export class ownerRepository {
   public async deleteOwnersV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -1296,6 +1302,7 @@ export class ownerRepository {
 
   public async ownerStatusV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 

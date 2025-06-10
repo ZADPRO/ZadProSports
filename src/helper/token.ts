@@ -113,7 +113,6 @@ function decodeToken(token: string): JwtPayload | { error: string } {
 // }
 
 function validateToken(request: any, h: ResponseToolkit) {
-  console.log("request", request);
 
   const authHeader = request.headers.authorization;
   console.log("authHeader line ----- 66  \n \n", authHeader);

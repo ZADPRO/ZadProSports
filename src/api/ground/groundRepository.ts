@@ -45,12 +45,12 @@ import {
 import { CurrentTime } from "../../helper/common";
 
 export class groundRepository {
-
   public async addGroundV1(userData: any, tokendata: any): Promise<any> {
     console.log("userData", userData);
     const client: PoolClient = await getClient();
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -74,7 +74,7 @@ export class groundRepository {
         refStatus,
         IframeLink,
         refTournamentPrice,
-        groundLocationLink
+        groundLocationLink,
       } = userData;
 
       // Prepare array strings for Postgres arrays
@@ -262,6 +262,7 @@ export class groundRepository {
     const client: PoolClient = await getClient();
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
     try {
       await client.query("BEGIN");
@@ -285,7 +286,7 @@ export class groundRepository {
         refStatus,
         IframeLink,
         refTournamentPrice,
-        groundLocationLink
+        groundLocationLink,
       } = userData;
 
       // Prepare array strings for Postgres arrays
@@ -556,7 +557,9 @@ export class groundRepository {
   }
 
   public async uploadRoomImageV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     try {
@@ -608,7 +611,10 @@ export class groundRepository {
     }
   }
   public async deleteRoomImageV1(userData: any, tokendata: any): Promise<any> {
-    const token = { id: tokendata.id };
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
+
     const tokens = generateTokenWithExpire(token, true);
     try {
       let filePath: string | any;
@@ -678,6 +684,7 @@ export class groundRepository {
   ): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     try {
@@ -734,6 +741,7 @@ export class groundRepository {
   ): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     try {
@@ -798,28 +806,26 @@ export class groundRepository {
       );
     }
   }
- 
 
   public async listGroundV1(userData: any, tokendata: any): Promise<any> {
-    const tokenPayload = { id: tokendata.id, roleId: tokendata.roleId };
-    console.log('tokendata.roleId', tokendata.roleId)
-    console.log('tokenPayload', tokenPayload)
-    const tokens = generateTokenWithExpire(tokenPayload, true);
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("tokenPayload", token);
+
+    const tokens = generateTokenWithExpire(token, true);
 
     try {
       let result: any[];
       let addons: any[];
 
       if (tokendata.roleId !== 1) {
-        console.log('tokendata.roleId', tokendata.roleId)
+        console.log("tokendata.roleId", tokendata.roleId);
         result = await executeQuery(listGroundQuery, [tokendata.id]);
         addons = await executeQuery(listinListGroundaddonsQuery, [
           tokendata.id,
         ]);
       } else {
         result = await executeQuery(listAllGroundQuery);
-        addons = await executeQuery(listinListAllGroundaddonsQuery,         
-        );
+        addons = await executeQuery(listinListAllGroundaddonsQuery);
       }
 
       return encrypt(
@@ -850,6 +856,7 @@ export class groundRepository {
   public async deleteGroundV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -935,6 +942,7 @@ export class groundRepository {
   public async getGroundV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -1008,6 +1016,7 @@ export class groundRepository {
   public async addAddonsV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -1066,6 +1075,7 @@ export class groundRepository {
   public async updateAddonsV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -1124,6 +1134,7 @@ export class groundRepository {
   public async deleteAddonsV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
 
@@ -1189,6 +1200,7 @@ export class groundRepository {
   public async listAddOnsV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -1232,6 +1244,7 @@ export class groundRepository {
   ): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     console.log("tokendata.id", tokendata.id);
     const tokens = generateTokenWithExpire(token, true);
@@ -1293,6 +1306,7 @@ export class groundRepository {
   ): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -1360,6 +1374,7 @@ export class groundRepository {
   ): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -1427,6 +1442,7 @@ export class groundRepository {
   ): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
 
     const tokens = generateTokenWithExpire(token, true);
 

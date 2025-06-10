@@ -87,3 +87,17 @@ SET
 WHERE
   "weeklyPayoutsid" = $1
 `;
+
+export const deletePayoutsquery = `
+UPDATE
+  public."weeklyPayouts"
+SET
+  "isDelete" = true,
+  "deletedAt" = $2,
+  "deletedBy" = $3
+WHERE
+  "payoutId" = $1
+RETURNING
+  *;
+`;
+

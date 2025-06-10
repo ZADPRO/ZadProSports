@@ -13,11 +13,21 @@ export class financeRoutes implements IRoute {
       server.route([
         {
           method: "GET",
+          path: "/api/v1/financeRoutes/bookingList",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.bookingList,
+            description: "bookingList",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
+        {
+          method: "POST",
           path: "/api/v1/financeRoutes/recordBookingFinance",
           config: {
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.recordBookingFinance,
-            // validate: validate.recordBookingFinance,
             description: "handleBookingFinance",
             tags: ["api", "Users"],
             auth: false,
@@ -36,17 +46,28 @@ export class financeRoutes implements IRoute {
           },
         },
         {
-          method: "POST",
+          method: "GET",
           path: "/api/v1/financeRoutes/listPayoutes",
           config: {
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.listPayoutes,
-            // validate: validate.recordBookingFinance,
             description: "listPayoutes",
             tags: ["api", "Users"],
             auth: false,
           },
         },
+        {
+          method: "POST",
+          path: "/api/v1/financeRoutes/deletePayouts",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.deletePayouts,
+            description: "deletePayouts",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
+
       ]);
       resolve(true);
     });

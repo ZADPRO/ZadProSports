@@ -261,15 +261,37 @@ WHERE
 
 export const listOverallAuditQuery = `
 SELECT
-  tx.*,
+  tx."refTxnHistoryId",
+  tx."updatedBy",
+  tx."refTransData",
+  tx."updatedAt",
+  u."refUserFname",
   tt."refTransactionType"
 FROM
   public."refTxnHistory" tx
   LEFT JOIN public."refTransactionType" tt ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
+  LEFT JOIN public."users" u ON CAST(u."refuserId" AS INTEGER) = tx."updatedBy"::int
 WHERE
   tx."isDelete" IS NOT true
+  AND (
+    tx."refTransactionTypeId" = '1'
+    OR tx."refTransactionTypeId" = '2'
+    OR tx."refTransactionTypeId" = '3'
+    OR tx."refTransactionTypeId" = '4'
+    OR tx."refTransactionTypeId" = '5'
+    OR tx."refTransactionTypeId" = '27'
+    OR tx."refTransactionTypeId" = '28'
+    OR tx."refTransactionTypeId" = '29'
+    OR tx."refTransactionTypeId" = '30'
+    OR tx."refTransactionTypeId" = '31'
+    OR tx."refTransactionTypeId" = '32'
+    OR tx."refTransactionTypeId" = '38'
+    OR tx."refTransactionTypeId" = '39'
+    OR tx."refTransactionTypeId" = '40'
+  )
+  AND tx."updatedBy"::int != 3
 ORDER BY
-  tx."refTxnHistoryId" ASC
+  tx."refTxnHistoryId" DESC;
 `;
 
 export const listReportQuery = `
@@ -368,19 +390,55 @@ WHERE
 
 export const ownerStatusAuditQuery = `
 SELECT
-  *
+  tt."refTransactionType",
+  tx.*
 FROM
-  public."refTxnHistory"
+  public."refTxnHistory" tx
+  LEFT JOIN public."refTransactionType" tt ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
+  LEFT JOIN public."users" u ON CAST(u."refuserId" AS INTEGER) = tx."updatedBy"::int
 WHERE
-  "refTransactionTypeId" = '39';
+  tx."refTransactionTypeId" = '39'
+  AND tx."refTransactionTypeId" = '36'
+  AND tx."refTransactionTypeId" = '37'
+  AND tx."refTransactionTypeId" = '38'
+  AND tx."isDelete" IS NOT true
+  ORDER BY
+  tx."refTxnHistoryId" DESC;
 `
 ;
 export const groundAuditQuery = `
 SELECT
-  *
+  tt."refTransactionType",
+  tx.*,
+  o."refOwnerFname"
 FROM
-  public."refTxnHistory"
+  public."refTxnHistory" tx
+  LEFT JOIN public."refTransactionType" tt ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
+  LEFT JOIN public."owners" o ON CAST(o."refOwnerId" AS INTEGER) = tx."updatedBy"::int
 WHERE
-  "refTransactionTypeId" = '40';
+  tx."refTransactionTypeId" = '40'
+  AND tx."refTransactionTypeId" = '24'
+  AND tx."refTransactionTypeId" = '25'
+  AND tx."refTransactionTypeId" = '26'
+  AND tx."refTransactionTypeId" = '33'
+  AND tx."refTransactionTypeId" = '34'
+  AND tx."refTransactionTypeId" = '35'
+    AND tx."isDelete" IS NOT true
+
+  ORDER BY
+  tx."refTxnHistoryId" DESC;
 `
 ;
+
+export const deleteAuditQuery = `
+UPDATE
+  public."refTxnHistory"
+SET
+  "isDelete" = true,
+  "deletedAt" = $2,
+  "deletedBy" = $3
+WHERE
+  "refTxnHistoryId" = $1
+RETURNING
+  *;
+`;

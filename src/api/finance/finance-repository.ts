@@ -13,43 +13,151 @@ import {
 } from "../../helper/token";
 
 import { CurrentTime } from "../../helper/common";
-import { groundEarningsQuery } from "./query";
+import { deletePayoutsquery, groundEarningsQuery } from "./query";
 
 export class financeRepository {
+  public async bookingListV1(userData: any, tokendata: any): Promise<any> {
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
+    const tokens = generateTokenWithExpire(token, true);
+
+    try {
+      // // Determine the current week's start and end dates
+      // const now = new Date();
+      // const dayOfWeek = now.getDay(); // 0 (Sun) to 6 (Sat)
+      // const diffToMonday =
+      //   now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+
+      // const weekStart = new Date(now.setDate(diffToMonday));
+      // weekStart.setHours(0, 0, 0, 0);
+
+      // const weekEnd = new Date(weekStart);
+      // weekEnd.setDate(weekStart.getDate() + 6);
+      // weekEnd.setHours(23, 59, 59, 999);
+
+      // // Format helper
+      // const formatDate = (date: Date) => {
+      //   const year = date.getFullYear();
+      //   const month = String(date.getMonth() + 1).padStart(2, "0"); // month is 0-based
+      //   const day = String(date.getDate()).padStart(2, "0");
+      //   return `${year}-${month}-${day}`;
+      // };
+
+      // Fetch earnings per owner
+      const earningsQuery = `
+SELECT
+  o."refOwnerId",
+  o."refOwnerCustId",
+  o."refOwnerFname",
+  o."refEmailId",
+  o."refMobileId",
+  rg."refGroundId",
+  rg."refGroundName",
+  rg."refGroundCustId",
+  ROUND(SUM(ub."retTotalAmount"::numeric), 2) AS "totalEarnings",
+  ROUND(SUM((ub."retTotalAmount"::numeric * 30 / 100)), 2) AS "totalCommission",
+  ROUND(SUM(ub."retTotalAmount"::numeric - (ub."retTotalAmount"::numeric * 30 / 100)), 2) AS "ownerReceivable"
+FROM
+  public."refUserBooking" ub
+ LEFT JOIN public."refGround" rg ON ub."refGroundId" = rg."refGroundId"
+ LEFT JOIN public.owners o ON rg."createdBy"::integer = o."refOwnerId"
+WHERE
+  ub."isDelete" IS NOT true
+GROUP BY
+  o."refOwnerId",
+  o."refOwnerCustId",
+  o."refOwnerFname",
+  o."refEmailId",
+  o."refMobileId",
+  rg."refGroundId";
+    `;
+      const earningsResult = await executeQuery(earningsQuery, []);
+      console.log("earningsResult", earningsResult);
+
+      return encrypt(
+        {
+          success: true,
+          message: "Weekly payouts generated successfully.",
+          token: tokens,
+          earningsResult: earningsResult,
+        },
+        true
+      );
+    } catch (error) {
+      console.error("Error generating weekly payouts:", error);
+      return encrypt(
+        {
+          success: false,
+          message: "Error generating weekly payouts.",
+          token: tokens,
+        },
+        true
+      );
+    }
+  }
   public async recordBookingFinanceV1(
     userData: any,
     tokendata: any
   ): Promise<any> {
     const client: PoolClient = await getClient();
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
 
     try {
       await client.query("BEGIN");
 
-      // Determine the current week's start and end dates
-      const now = new Date();
-      const dayOfWeek = now.getDay(); // 0 (Sun) to 6 (Sat)
-      const diffToMonday =
-        now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+      // // Determine the current week's start and end dates
+      // const now = new Date();
+      // const dayOfWeek = now.getDay(); // 0 (Sun) to 6 (Sat)
+      // const diffToMonday =
+      //   now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
 
-      const weekStart = new Date(now.setDate(diffToMonday));
+      // const weekStart = new Date(now.setDate(diffToMonday));
+      // weekStart.setHours(0, 0, 0, 0);
+
+      // const weekEnd = new Date(weekStart);
+      // weekEnd.setDate(weekStart.getDate() + 6);
+      // weekEnd.setHours(23, 59, 59, 999);
+
+      // // Format helper
+      // const formatDate = (date: Date) => {
+      //   const year = date.getFullYear();
+      //   const month = String(date.getMonth() + 1).padStart(2, "0"); // month is 0-based
+      //   const day = String(date.getDate()).padStart(2, "0");
+      //   return `${year}-${month}-${day}`;
+      // };
+
+      // console.log("Week Start:", formatDate(weekStart)); // e.g. 2025-06-02
+      // console.log("Week End:", formatDate(weekEnd)); // e.g. 2025-06-08
+      // 1. Get weekStart and weekEnd from userData
+      const { weekStartDate, weekEndDate } = userData;
+
+      if (!weekStartDate || !weekEndDate) {
+        throw new Error("Week start date and end date are required.");
+      }
+
+      const weekStart = new Date(weekStartDate);
       weekStart.setHours(0, 0, 0, 0);
 
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
+      const weekEnd = new Date(weekEndDate);
       weekEnd.setHours(23, 59, 59, 999);
+
+      // Optional: Validate that weekEnd is after weekStart
+      if (weekEnd <= weekStart) {
+        throw new Error("Week end date must be after start date.");
+      }
 
       // Format helper
       const formatDate = (date: Date) => {
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0"); // month is 0-based
+        const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
       };
 
-      console.log("Week Start:", formatDate(weekStart)); // e.g. 2025-06-02
-      console.log("Week End:", formatDate(weekEnd)); // e.g. 2025-06-08
+      console.log("Week Start:", formatDate(weekStart));
+      console.log("Week End:", formatDate(weekEnd));
 
       // Fetch earnings per owner
       const earningsQuery = `
@@ -92,7 +200,7 @@ GROUP BY
       for (const row of earningsResult.rows) {
         const insertQuery = `
       INSERT INTO
-   public."weeklyPayouts" (
+     public."weeklyPayouts" (
     "refOwnerId",
     "weekStartDate",
     "weekEndDate",
@@ -148,8 +256,10 @@ VALUES
   }
 
   //update paid status
+
   public async getWeeklyPayoutsV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
 
     try {
@@ -187,23 +297,25 @@ VALUES
       );
     }
   }
+
   public async listPayoutesV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
     const tokens = generateTokenWithExpire(token, true);
 
     try {
       const listquery = `
       SELECT
-  wp."payoutId",
-  o."refOwnerFname",
-  wp."weekStartDate",
-  wp."weekEndDate",
-  wp."totalEarnings",
-  wp."totalCommission",
-  wp."ownerReceivable",
-  wp."payoutStatus",
-  wp."payoutDate"
-FROM
+     wp."payoutId",
+     o."refOwnerFname",
+     wp."weekStartDate",
+     wp."weekEndDate",
+    wp."totalEarnings",
+    wp."totalCommission",
+    wp."ownerReceivable",
+    wp."payoutStatus",
+    wp."payoutDate"
+  FROM
   public."weeklyPayouts" wp
   LEFT JOIN "owners" o ON wp."refOwnerId" = o."refOwnerId"
 WHERE
@@ -211,27 +323,54 @@ WHERE
 ORDER BY
   wp."weekStartDate" DESC
     `;
-      const result = await executeQuery(listquery, [
-        userData.payoutId,
-        CurrentTime(),
-        CurrentTime(),
-      ]);
+      const result = await executeQuery(listquery);
 
       return encrypt(
         {
           success: true,
-          message: "Weekly payout marked as paid successfully.",
+          message: "list payout successfully.",
           token: tokens,
           result: result,
         },
         true
       );
     } catch (error) {
-      console.error("Error marking weekly payout:", error);
+      console.error("Error marking list payout:", error);
       return encrypt(
         {
           success: false,
-          message: "Error marking weekly payout.",
+          message: "Error marking list payout.",
+          token: tokens,
+        },
+        true
+      );
+    }
+  }
+  public async deletePayoutsV1(userData: any, tokendata: any): Promise<any> {
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
+    const tokens = generateTokenWithExpire(token, true);
+
+    try {
+      const result = await executeQuery(deletePayoutsquery, [
+        userData.payoutId,
+      ]);
+
+      return encrypt(
+        {
+          success: true,
+          message: "delete payout successfully.",
+          token: tokens,
+          result: result,
+        },
+        true
+      );
+    } catch (error) {
+      console.error("Error marking delete payout:", error);
+      return encrypt(
+        {
+          success: false,
+          message: "Error marking delete payout.",
           token: tokens,
         },
         true

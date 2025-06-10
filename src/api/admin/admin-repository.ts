@@ -19,6 +19,7 @@ import {
   approveGrounNamedQuery,
   checkEmailQuery,
   checkMobileQuery,
+  deleteAuditQuery,
   deleteUserBookingQuery,
   getLastCustomerIdQuery,
   groundAuditQuery,
@@ -262,40 +263,11 @@ export class adminRepository {
       client.release();
     }
   }
-  // public async listUserBookingsV1(userData: any, tokendata: any): Promise<any> {
-  //   const token = { id: tokendata.id };
-  //   const tokens = generateTokenWithExpire(token, true);
-
-  //   try {
-  //     const result = await executeQuery(listUserBookingsQuery);
-
-  //     return encrypt(
-  //       {
-  //         success: true,
-  //         message: "ground booking listed successfully",
-  //         token: tokens,
-  //         result: result, // Return deleted record for reference
-  //       },
-  //       true
-  //     );
-  //   } catch (error: unknown) {
-  //     console.error("Error list ground", error);
-
-  //     return encrypt(
-  //       {
-  //         success: false,
-  //         message: "An error occurred while list ground booking",
-  //         token: tokens,
-  //         error: String(error),
-  //       },
-  //       true
-  //     );
-  //   }
-  // }
 
   public async listUserBookingsV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 
@@ -348,6 +320,7 @@ export class adminRepository {
   public async deleteBookingsV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -414,6 +387,7 @@ export class adminRepository {
   public async listSignUpUsersV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 
@@ -446,6 +420,7 @@ export class adminRepository {
   public async listOverallAuditV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 
@@ -478,6 +453,7 @@ export class adminRepository {
   public async reportPageV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 
@@ -510,6 +486,7 @@ export class adminRepository {
   public async dashboardV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 
@@ -547,6 +524,7 @@ export class adminRepository {
   }
   public async approveGroundV1(userData: any, tokendata: any): Promise<any> {
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
     const client: PoolClient = await getClient();
@@ -619,6 +597,7 @@ export class adminRepository {
   public async ownerAuditV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 
@@ -648,6 +627,72 @@ export class adminRepository {
         },
         true
       );
+    }
+  }
+  public async deleteAuditV1(userData: any, tokendata: any): Promise<any> {
+    // const token = { id: tokendata.id };
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
+    const tokens = generateTokenWithExpire(token, true);
+    const client: PoolClient = await getClient();
+
+    try {
+      await client.query("BEGIN"); // Start transaction
+
+      const { refTxnHistoryId } = userData;
+      const result = await client.query(deleteAuditQuery, [
+        refTxnHistoryId,
+        CurrentTime(),
+        tokendata.id,
+      ]);
+
+      if (result.rowCount === 0) {
+        await client.query("ROLLBACK");
+        return encrypt(
+          {
+            success: false,
+            message: "audit not found or already deleted",
+            token: tokens,
+          },
+          true
+        );
+      }
+
+      // const history = [
+      //   27, // Unique ID for delete action
+      //   tokendata.id,
+      //   `booking deleted succesfully`,
+      //   CurrentTime(),
+      //   tokendata.id,
+      // ];
+
+      // await client.query(updateHistoryQuery, history);
+      await client.query("COMMIT"); // Commit transaction
+
+      return encrypt(
+        {
+          success: true,
+          message: "audit deleted successfully",
+          token: tokens,
+          deletedData: result.rows[0], // Return deleted record for reference
+        },
+        true
+      );
+    } catch (error: unknown) {
+      await client.query("ROLLBACK"); // Rollback on error
+      console.error("Error deleting audit:", error);
+
+      return encrypt(
+        {
+          success: false,
+          message: "An error occurred while deleting the audit",
+          token: tokens,
+          error: String(error),
+        },
+        true
+      );
+    } finally {
+      client.release();
     }
   }
 }

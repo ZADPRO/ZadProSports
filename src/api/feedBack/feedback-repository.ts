@@ -33,6 +33,7 @@ export class feedBackRepository {
     const client: PoolClient = await getClient();
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
     try {
@@ -91,6 +92,7 @@ export class feedBackRepository {
   public async listFeedBackV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 
@@ -125,6 +127,7 @@ export class feedBackRepository {
     const client: PoolClient = await getClient();
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 
@@ -208,6 +211,7 @@ export class feedBackRepository {
   ): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log('token', token)
 
     const tokens = generateTokenWithExpire(token, true);
 

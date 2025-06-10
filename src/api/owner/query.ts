@@ -312,7 +312,7 @@ SELECT
   o.*,
   COALESCE(
     json_agg(
-      json_build_object(
+      DISTINCT jsonb_build_object(
         'refOwnerSportsMappingId',
         us."ownerSportsMappingId",
         'refSportsCategoryId',
@@ -327,15 +327,38 @@ SELECT
         us."ownerSportsMappingId" IS NOT NULL
     ),
     '[]'
-  ) AS ownerSportsMappings
+  ) AS ownerSportsMappings,
+  COALESCE(
+    json_agg(
+      DISTINCT jsonb_build_object(
+        'refGroundId',
+        rg."refGroundId",
+        'refGroundName',
+        rg."refGroundName",
+        'refGroundCustId',
+        rg."refGroundCustId",
+        'refGroundPrice',
+        rg."refGroundPrice",
+        'refGroundLocation',
+        rg."refGroundLocation",
+        'approveGround',
+        rg."approveGround"
+      )
+    ) FILTER (
+      WHERE
+        rg."refGroundId" IS NOT NULL
+    ),
+    '[]'
+  ) AS grounds
 FROM
   public."owners" o
   LEFT JOIN public."userSportsMapping" us ON CAST(us."refOwnerId" AS INTEGER) = o."refOwnerId"
   LEFT JOIN public."refSportsCategory" s ON CAST(s."refSportsCategoryId" AS INTEGER) = us."refSportsCategoryId"
+  LEFT JOIN public."refGround" rg ON CAST(rg."createdBy" AS INTEGER) = o."refOwnerId"
 WHERE
   o."refOwnerId" = $1
 GROUP BY
-  o."refOwnerId"
+  o."refOwnerId";
 `;
 
 export const listSportCategoryQuery = `

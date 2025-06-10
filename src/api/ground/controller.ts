@@ -225,7 +225,7 @@ export class groundController {
       return response.response(entity).code(200); // Bad Request if failed
 
     } catch (error) {
-      logger.error("Error in list Ground Image" , error);
+      logger.error("Error in list Ground " , error);
       return response
         .response({
           success: false,

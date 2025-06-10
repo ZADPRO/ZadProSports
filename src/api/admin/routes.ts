@@ -79,7 +79,7 @@ export class adminRoutes implements IRoute {
             auth: false,
           },
         },
-         {
+        {
           method: "GET",
           path: "/api/v1/adminRoutes/reportPage",
           config: {
@@ -90,7 +90,7 @@ export class adminRoutes implements IRoute {
             auth: false,
           },
         },
-         {
+        {
           method: "GET",
           path: "/api/v1/adminRoutes/dashboard",
           config: {
@@ -101,7 +101,7 @@ export class adminRoutes implements IRoute {
             auth: false,
           },
         },
-         {
+        {
           method: "POST",
           path: "/api/v1/adminRoutes/approveGround",
           config: {
@@ -112,13 +112,24 @@ export class adminRoutes implements IRoute {
             auth: false,
           },
         },
-         {
+        {
           method: "GET",
           path: "/api/v1/adminRoutes/ownerAudit",
           config: {
             pre: [{ method: validateToken, assign: "token" }],
             handler: controller.ownerAudit,
             description: "ownerAudit",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
+        {
+          method: "POST",
+          path: "/api/v1/adminRoutes/deleteAudit",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.deleteAudit,
+            description: "deleteAudit",
             tags: ["api", "Users"],
             auth: false,
           },
