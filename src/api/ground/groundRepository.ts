@@ -828,6 +828,25 @@ export class groundRepository {
         addons = await executeQuery(listinListAllGroundaddonsQuery);
       }
 
+
+       for (const product of result) {
+        if (product.refGroundImage) {
+          try {
+            const fileBuffer = await viewFile(product.refGroundImage);
+            product.refGroundImage = {
+              filename: path.basename(product.refGroundImage),
+              content: fileBuffer.toString("base64"),
+              contentType: "image/jpeg", // Change based on actual file type if necessary
+            };
+          } catch (err) {
+            console.error(
+              "Error reading image file for product ${product.productId}:",
+              err
+            );
+            product.refGroundImage = null; // Handle missing or unreadable files gracefully
+          }
+        }
+      }
       return encrypt(
         {
           success: true,
