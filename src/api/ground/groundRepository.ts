@@ -682,14 +682,15 @@ export class groundRepository {
     userData: any,
     tokendata: any
   ): Promise<any> {
+    console.log('userData', userData)
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
     console.log("token", token);
-
     const tokens = generateTokenWithExpire(token, true);
     try {
       // Extract the image from userData
       const image = userData.Image;
+      console.log('image', image)
 
       // Ensure that only one image is provided
       if (!image) {
@@ -827,7 +828,6 @@ export class groundRepository {
         result = await executeQuery(listAllGroundQuery);
         addons = await executeQuery(listinListAllGroundaddonsQuery);
       }
-
 
        for (const product of result) {
         if (product.refGroundImage) {

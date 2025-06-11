@@ -363,7 +363,19 @@ SELECT
     WHERE
       u."isDelete" IS NOT true
       AND u."refCustId" LIKE 'CGA-OWN-%'
-  ) AS "OwnerCount"
+  ) AS "OwnerCount",
+(SELECT
+  SUM("totalEarnings"::numeric)
+FROM
+  public."weeklyPayouts" ) AS "TotalGroundEarnings",
+(SELECT
+  SUM("ownerReceivable"::numeric)
+FROM
+  public."weeklyPayouts" ) AS "ownerReceivable",
+  (SELECT
+  SUM("totalCommission"::numeric)
+FROM
+  public."weeklyPayouts" ) AS "totalCommission"
 `;
 
 

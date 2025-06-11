@@ -354,6 +354,8 @@ ORDER BY
     try {
       const result = await executeQuery(deletePayoutsquery, [
         userData.payoutId,
+        CurrentTime(),
+        tokendata.id
       ]);
 
       return encrypt(

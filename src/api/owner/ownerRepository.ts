@@ -43,204 +43,6 @@ import {
 import { sendEmail } from "../../helper/mail";
 
 export class ownerRepository {
-  // public async addOwnersV1(userData: any, token_data?: any): Promise<any> {
-  //   const client: PoolClient = await getClient();
-
-  //   try {
-  //     await client.query("BEGIN");
-  //     const {
-  //       refOwnerFname,
-  //       refOwnerLname,
-  //       refEmailId,
-  //       refMobileId,
-  //       refCustPassword,
-  //       refAadharId,
-  //       refPANId,
-  //       refGSTnumber,
-  //       isOwnGround,
-  //       refGroundImage,
-  //       refGroundDescription,
-  //       refBankName,
-  //       refBankBranch,
-  //       refAcHolderName,
-  //       refAccountNumber,
-  //       refIFSCcode,
-  //       refDocument1Path,
-  //       refDocument2Path,
-  //       isDefaultAddress
-  //     } = userData;
-
-  //     // const genPassword = generatePassword();
-  //     const genHashedPassword = await bcrypt.hash(refCustPassword, 10);
-
-  //     // Check if the username already exists
-  //     const check = [userData.refUserEmail];
-  //     const userCheck = await client.query(checkQuery, check);
-  //     const count = Number(userCheck.rows[0]?.count || 0); // safely convert to number
-
-  //     if (count > 0) {
-  //       await client.query("ROLLBACK");
-  //       return encrypt(
-  //         {
-  //           success: false,
-  //           message: "Email Already exists",
-  //           // token: tokens,
-  //         },
-  //         true
-  //       );
-  //     }
-
-  //     const customerPrefix = "CGA-OWN-";
-  //     const baseNumber = 0;
-
-  //     const lastCustomerResult = await client.query(getLastPartnerIdQuery);
-  //     let newCustomerId: string;
-
-  //     if (lastCustomerResult.rows.length > 0) {
-  //       const lastNumber = parseInt(lastCustomerResult.rows[0].count, 10);
-  //       newCustomerId = `${customerPrefix}${(baseNumber + lastNumber + 1)
-  //         .toString()
-  //         .padStart(4, "0")}`;
-  //     } else {
-  //       newCustomerId = `${customerPrefix}${(baseNumber + 1)
-  //         .toString()
-  //         .padStart(4, "0")}`;
-  //     }
-
-  //     // Insert into users table
-  //     const params = [
-  //       newCustomerId,
-  //       refOwnerFname,
-  //       refOwnerLname,
-  //       refEmailId,
-  //       refMobileId,
-  //       refCustPassword,
-  //       genHashedPassword,
-  //       refAadharId,
-  //       refPANId,
-  //       refGSTnumber,
-  //       isOwnGround,
-  //       refGroundImage,
-  //       refGroundDescription,
-  //       refBankName,
-  //       refBankBranch,
-  //       refAcHolderName,
-  //       refAccountNumber,
-  //       refIFSCcode,
-  //       refDocument1Path,
-  //       refDocument2Path,
-  //       isDefaultAddress,
-  //       3,
-  //       `Draft`,
-  //       CurrentTime(),
-  //       3,
-  //     ];
-
-  //     const userResult = await client.query(insertUserQuery, params);
-  //     const newUser = userResult.rows[0];
-
-  //     const allSportDetails = []; // collect all
-
-  //     const commonAddress = userData.groundAddress || null;
-
-  //     if (Array.isArray(userData.refGroundSports)) {
-  //       for (const sport of userData.refGroundSports) {
-  //         const sportAddress = sport.groundAddress || commonAddress;
-  //         const insertSportQuery = `
-  //     INSERT INTO "userSportsMapping"
-  //       ("refOwnerId", "refSportsCategoryId", "groundAddress", "createdAt", "createdBy")
-  //     VALUES ($1, $2, $3, $4, $5)
-  //   `;
-
-  //         const sportParams = [
-  //           newUser.refOwnerId,
-  //           sport.id,
-  //           sportAddress,
-  //           CurrentTime(),
-  //           newUser.refOwnerId,
-  //         ];
-
-  //         const sportInsertResult = await client.query(
-  //           insertSportQuery,
-  //           sportParams
-  //         );
-  //         allSportDetails.push(sportInsertResult.rows[0]);
-  //       }
-  //     }
-
-  //     if ((userResult.rowCount ?? 0) > 0) {
-  //       const history = [
-  //         36,
-  //         newUser.refOwnerId,
-  //         `${refOwnerFname} Owner form submitted succcesfully`,
-  //         CurrentTime(),
-  //         newUser.refOwnerId,
-  //       ];
-  //       const updateHistory = await client.query(updateHistoryQuery, history);
-
-  //       if ((updateHistory.rowCount ?? 0) > 0) {
-  //         // const tokenData = {
-  //         //   id: newUser.refUserId,
-  //         //   email: userData.refUserEmail,
-  //         // };
-
-  //         await client.query("COMMIT");
-  //         const main = async () => {
-  //           const mailOptions = {
-  //             to: refEmailId,
-  //             subject: "You Form has be submitted Successfully In our Platform", // Subject of the email
-  //             html: generateFormSubmittedContent(refOwnerFname),
-  //           };
-
-  //           // Call the sendEmail function
-  //           try {
-  //             sendEmail(mailOptions);
-  //           } catch (error) {
-  //             console.error("Failed to send email:", error);
-  //           }
-  //         };
-  //         main().catch(console.error);
-
-  //         return encrypt(
-  //           {
-  //             success: true,
-  //             message: "Owner added successful",
-  //             user: newUser,
-  //             sportDetails: allSportDetails,
-  //             roleId: 3,
-  //             // token: tokens,
-  //           },
-  //           true
-  //         );
-  //       }
-  //     }
-
-  //     await client.query("ROLLBACK");
-  //     return encrypt(
-  //       {
-  //         success: false,
-  //         message: "failed Owner added",
-  //         // token: tokens,
-  //       },
-  //       true
-  //     );
-  //   } catch (error: unknown) {
-  //     await client.query("ROLLBACK");
-  //     console.error("Error during Owner added:", error);
-  //     return encrypt(
-  //       {
-  //         success: false,
-  //         message: "An unexpected error occurred during Owner added",
-  //         error: error instanceof Error ? error.message : String(error),
-  //         // token: tokens,
-  //       },
-  //       true
-  //     );
-  //   } finally {
-  //     client.release();
-  //   }
-  // }
-
   public async addOwnersV1(userData: any, token_data?: any): Promise<any> {
     const client: PoolClient = await getClient();
 
@@ -757,7 +559,7 @@ export class ownerRepository {
             product.refDocument1Path = {
               filename: path.basename(product.refDocument1Path),
               content: fileBuffer.toString("base64"),
-              contentType: "image/jpeg", // Change based on actual file type if necessary
+              contentType: "application/pdf", // Change based on actual file type if necessary
             };
           } catch (err) {
             console.error("Error reading image file for product ", err);
@@ -770,7 +572,7 @@ export class ownerRepository {
             product.refDocument2Path = {
               filename: path.basename(product.refDocument2Path),
               content: fileBuffer.toString("base64"),
-              contentType: "image/jpeg", // Change based on actual file type if necessary
+              contentType: "application/pdf", // Change based on actual file type if necessary
             };
           } catch (err) {
             console.error("Error reading image file for product ", err);
@@ -878,162 +680,6 @@ export class ownerRepository {
       );
     }
   }
-
-  // public async updateOwnersV1(userData: any, token_data?: any): Promise<any> {
-  //   const client: PoolClient = await getClient();
-  //   const token = { id: token_data.id, roleId: token_data.roleId };
-  //   const tokens = generateTokenWithExpire(token, true);
-
-  //   try {
-  //     await client.query("BEGIN");
-
-  //     const {
-  //       // refOwnerId,
-  //       refOwnerFname,
-  //       refOwnerLname,
-  //       refEmailId,
-  //       refMobileId,
-  //       refCustPassword,
-  //       refAadharId,
-  //       refPANId,
-  //       refGSTnumber,
-  //       isOwnGround,
-  //       refGroundImage,
-  //       refGroundDescription,
-  //       refBankName,
-  //       refBankBranch,
-  //       refAcHolderName,
-  //       refAccountNumber,
-  //       refIFSCcode,
-  //       refDocument1Path,
-  //       refDocument2Path,
-  //       groundAddress,
-  //     } = userData;
-
-  //     const genHashedPassword = await bcrypt.hash(refCustPassword, 10);
-
-  //     // Update users table
-  //     const userParams = [
-  //       token_data.id,
-  //       refOwnerFname,
-  //       refOwnerLname,
-  //       refEmailId,
-  //       refMobileId,
-  //       refCustPassword,
-  //       genHashedPassword,
-  //       refAadharId,
-  //       refPANId,
-  //       refGSTnumber,
-  //       isOwnGround,
-  //       refGroundImage,
-  //       refGroundDescription,
-  //       refBankName,
-  //       refBankBranch,
-  //       refAcHolderName,
-  //       refAccountNumber,
-  //       refIFSCcode,
-  //       refDocument1Path,
-  //       refDocument2Path,
-  //       CurrentTime(),
-  //       token_data.id,
-  //     ];
-  //     const userResult = await client.query(updateUserQuery, userParams);
-
-  //     const softDeleteQuery = `
-  //     UPDATE "userSportsMapping"
-  //     SET "isDelete" = true, "deletedAt" = $2, "deletedBy" = $3
-  //     WHERE "refUserId" = $1
-  //   `;
-  //     await client.query(softDeleteQuery, [
-  //       token_data.id,
-  //       CurrentTime(),
-  //       token_data.id,
-  //     ]);
-
-  //     // Reinsert sports preferences
-  //     const allSportDetails = [];
-  //     const commonAddress = groundAddress || null;
-
-  //     if (Array.isArray(userData.refGroundSports)) {
-  //       for (const sport of userData.refGroundSports) {
-  //         const sportAddress = sport.groundAddress || commonAddress;
-
-  //         const insertSportQuery = `
-  //         INSERT INTO "userSportsMapping"
-  //           ("refUserId", "refSportsCategoryId", "groundAddress", "createdAt", "createdBy")
-  //         VALUES ($1, $2, $3, $4, $5)
-  //       `;
-  //         const sportParams = [
-  //           token_data.id,
-  //           sport.id,
-  //           sportAddress,
-  //           CurrentTime(),
-  //           token_data.id,
-  //         ];
-  //         const sportInsertResult = await client.query(
-  //           insertSportQuery,
-  //           sportParams
-  //         );
-  //         allSportDetails.push(sportInsertResult.rows[0]);
-  //       }
-  //     }
-
-  //     // Record history
-  //     if ((userResult.rowCount ?? 0) > 0) {
-  //       const historyParams = [
-  //         37,
-  //         token_data.id,
-  //         `${refOwnerFname} Owner updated successfully`,
-  //         CurrentTime(),
-  //         token_data.id,
-  //       ];
-  //       const historyResult = await client.query(
-  //         updateHistoryQuery,
-  //         historyParams
-  //       );
-
-  //       if ((historyResult.rowCount ?? 0) > 0) {
-  //         await client.query("COMMIT");
-  //         return encrypt(
-  //           {
-  //             success: true,
-  //             message: "Owner update successful",
-  //             user: userResult,
-  //             sportDetails: allSportDetails,
-  //             roleId: 3,
-  //             token: tokens,
-  //           },
-  //           true
-  //         );
-  //       }
-  //     }
-
-  //     await client.query("ROLLBACK");
-  //     return encrypt(
-  //       {
-  //         success: false,
-  //         message: "Owner update failed",
-  //         token: tokens,
-  //       },
-  //       true
-  //     );
-  //   } catch (error: unknown) {
-  //     await client.query("ROLLBACK");
-  //     console.error("Error during Owner update:", error);
-  //     return encrypt(
-  //       {
-  //         success: false,
-  //         message: "An unexpected error occurred during Owner update",
-  //         error: error instanceof Error ? error.message : String(error),
-  //         token: tokens,
-  //       },
-  //       true
-  //     );
-  //   } finally {
-  //     client.release();
-  //   }
-  // }
-
   public async updateOwnersV1(userData: any, token_data?: any): Promise<any> {
     const client: PoolClient = await getClient();
     const token = { id: token_data.id, roleId: token_data.roleId };
@@ -1401,6 +1047,7 @@ export class ownerRepository {
 
     try {
       const result = await executeQuery(OwnersHistoryQuery, [tokendata.id]);
+      console.log('result', result)
 
       for (const product of result) {
         if (product.refGroundImage) {
@@ -1422,7 +1069,7 @@ export class ownerRepository {
             product.refDocument1Path = {
               filename: path.basename(product.refDocument1Path),
               content: fileBuffer.toString("base64"),
-              contentType: "image/jpeg", // Change based on actual file type if necessary
+              contentType: "application/pdf", // Change based on actual file type if necessary
             };
           } catch (err) {
             console.error("Error reading image file for product ", err);
@@ -1435,7 +1082,7 @@ export class ownerRepository {
             product.refDocument2Path = {
               filename: path.basename(product.refDocument2Path),
               content: fileBuffer.toString("base64"),
-              contentType: "image/jpeg", // Change based on actual file type if necessary
+              contentType: "application/pdf", // Change based on actual file type if necessary
             };
           } catch (err) {
             console.error("Error reading image file for product ", err);

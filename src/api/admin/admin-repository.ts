@@ -493,18 +493,32 @@ export class adminRepository {
     try {
       // const result = await executeQuery(listdashboardQuery);
       let result;
-
+      
       if (tokendata.roleId !== 1) {
         result = await executeQuery(listdashboardQuery, [tokendata.id]);
       } else {
         result = await executeQuery(listAdmindashboardQuery);
       }
+      console.log('result', result)
+       const parsedResult =
+      Array.isArray(result) && result.length > 0
+        ? {
+            BookingCount: Number(result[0].BookingCount),
+            GroundCount: Number(result[0].GroundCount),
+            UsersCount: Number(result[0].UsersCount),
+            OwnerCount: Number(result[0].OwnerCount),
+            TotalGroundEarnings: Number(result[0].TotalGroundEarnings),
+            ownerReceivable: Number(result[0].ownerReceivable),
+            totalCommission: Number(result[0].totalCommission),
+          }
+        : {};
+
       return encrypt(
         {
           success: true,
           message: "list dashboard listed successfully",
           token: tokens,
-          result: result, // Return deleted record for reference
+          result: parsedResult, // Return  record for reference
         },
         true
       );
