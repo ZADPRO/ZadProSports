@@ -282,6 +282,14 @@ WHERE
   ud."refEmail" = $1
   AND u."refCustId" LIKE 'CGA-CUS-%';
 `;
+export const getOwnersQuery = `
+SELECT
+  *
+FROM
+  public."owners" o
+WHERE
+  o."refEmailId" = $1
+`;
 
 export const updateUserPasswordQuery = `
 UPDATE

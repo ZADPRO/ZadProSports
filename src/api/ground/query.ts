@@ -481,7 +481,6 @@ SELECT
     )
   ) AS "refSportsCategoryName",
 
-  -- AddOns structure with nested subAddOns and items
   (
     SELECT json_agg(
       DISTINCT jsonb_build_object(
@@ -547,7 +546,6 @@ WHERE
   AND aa."refGroundId" = $1
   AND ao."refAddOnsId" != '1'
   AND ao."refStatus" IS true
-AND aa."createdBy"::INTEGER = $2::INTEGER
   `;
 
 export const listBookedDatesQuery = `
@@ -564,7 +562,7 @@ WHERE
 
 export const imgResultQuery = `
 SELECT
-  *
+  "refGroundImage"
 FROM
   public."refGround"
 WHERE
@@ -707,7 +705,6 @@ WHERE
   AND "isDelete" IS NOT true
   AND "refAddOn" != 'Ground'
   AND "refGroundId" = $1
-   AND "createdBy"::integer = $2::integer
 `;
 export const listinListGroundaddonsQuery = `
 SELECT

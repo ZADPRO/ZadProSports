@@ -59,6 +59,7 @@ export default {
   forgotPassword: {
     payload: Joi.object({
       emailId: Joi.string().required(),
+      roleID:Joi.number().integer().required(),
     }),
     headers: Joi.object({
       authorization: Joi.string().optional(),

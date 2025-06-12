@@ -76,6 +76,7 @@ export class groundRepository {
         refTournamentPrice,
         groundLocationLink,
       } = userData;
+      console.log('userData', userData)
 
       // Prepare array strings for Postgres arrays
       const refFeatures = `{${refFeaturesId.join(",")}}`;
@@ -123,6 +124,7 @@ export class groundRepository {
         groundInsertParams
       );
       const groundId = groundResult.rows[0].refGroundId;
+      console.log('groundResult.rows[0]', groundResult.rows[0])
       console.log("groundId", groundId);
 
       // Maps to hold inserted IDs by name for referencing in sub records
@@ -135,7 +137,7 @@ export class groundRepository {
           // Insert AddOn
           const addonRes = await client.query(
             `
-          INSERT INTO "refAddOns" (
+            INSERT INTO "refAddOns" (
             "refAddOn",
             "refAddonPrice",
             "refGroundId",
@@ -156,6 +158,7 @@ export class groundRepository {
             ]
           );
           const addOnId = addonRes.rows[0].refAddOnsId;
+          console.log('addonRes.rows[0]', addonRes.rows[0])
           refAddOnsIdMap.set(addon.name, addOnId);
 
           // Insert SubAddOns if available
@@ -186,13 +189,14 @@ export class groundRepository {
                 ]
               );
               const subAddOnId = subRes.rows[0].subAddOnsId;
+              console.log('subRes.rows[0]', subRes.rows[0])
               refSubAddOnsIdMap.set(subAddon.name, subAddOnId);
 
               // Insert Items if available
               if (subAddon.isItemsAvailable && subAddon.refItems?.length) {
                 for (const item of subAddon.refItems) {
-                  await client.query(
-                    `
+                const items =  await client.query(
+                  `
                   INSERT INTO "refItems" (
                     "subAddOnsId",
                     "refItemsName",
@@ -201,7 +205,7 @@ export class groundRepository {
                     "createdAt",
                     "createdBy",
                     "refStatus"
-                  )
+                    )
                   VALUES ($1, $2, $3, $4, $5, $6, $7)
                   `,
                     [
@@ -214,13 +218,14 @@ export class groundRepository {
                       true,
                     ]
                   );
+                  console.log('items', items)
                 }
               }
             }
           }
         }
       }
-
+      
       // Add to history
       const history = [
         24,
@@ -320,7 +325,7 @@ export class groundRepository {
         "updatedBy" = $17,
         "refTournamentPrice" = $18,
         "groundLocationLink" = $19
-      WHERE "refGroundId" = $19
+      WHERE "refGroundId" = $20
     `,
         [
           refGroundName,
@@ -341,6 +346,7 @@ export class groundRepository {
           CurrentTime(),
           tokendata.id,
           refTournamentPrice,
+          groundLocationLink,
           refGroundId,
         ]
       );
@@ -958,7 +964,80 @@ export class groundRepository {
       client.release();
     }
   }
-  public async getGroundV1(userData: any, tokendata: any): Promise<any> {
+  // public async getGroundV1(userData: any, tokendata: any): Promise<any> {
+  //   // const token = { id: tokendata.id };
+  //   const token = { id: tokendata.id, roleId: tokendata.roleId };
+  //   console.log("token", token);
+
+  //   const tokens = generateTokenWithExpire(token, true);
+  //   const client: PoolClient = await getClient();
+
+  //   try {
+  //     await client.query("BEGIN"); // Start transaction
+
+  //     const { refGroundId } = userData;
+  //     const result: any = await client.query(getGroundQuery, [refGroundId]);
+  //     const getAddons = await executeQuery(getAvailableAddonsQuery, [
+  //       refGroundId,
+  //       tokendata.id,
+  //     ]);
+  //     const addons = await executeQuery(listaddonsQuery, [
+  //       refGroundId,
+  //       tokendata.id,
+  //     ]);
+  //     const imgResult = await executeQuery(imgResultQuery, [refGroundId]);
+
+  //     for (const product of imgResult) {
+  //       if (product.refGroundImage) {
+  //         try {
+  //           const fileBuffer = await viewFile(product.refGroundImage);
+  //           product.refGroundImage = {
+  //             filename: path.basename(product.refGroundImage),
+  //             content: fileBuffer.toString("base64"),
+  //             contentType: "image/jpeg", // Change based on actual file type if necessary
+  //           };
+  //         } catch (err) {
+  //           console.error(
+  //             "Error reading image file for product ${product.productId}:",
+  //             err
+  //           );
+  //           product.refGroundImage = null; // Handle missing or unreadable files gracefully
+  //         }
+  //       }
+  //     }
+
+  //     await client.query("COMMIT"); // Commit transaction
+
+  //     return encrypt(
+  //       {
+  //         success: true,
+  //         message: "ground get successfully",
+  //         token: tokens,
+  //         result: result.rows[0],
+  //         getAddons: getAddons, // Return deleted record for reference
+  //         listOfAddones: addons,
+  //         imgResult: imgResult,
+  //       },
+  //       true
+  //     );
+  //   } catch (error: unknown) {
+  //     await client.query("ROLLBACK"); // Rollback on error
+  //     console.error("Error get ground:", error);
+
+  //     return encrypt(
+  //       {
+  //         success: false,
+  //         message: "An error occurred while get the ground",
+  //         token: tokens,
+  //         error: String(error),
+  //       },
+  //       true
+  //     );
+  //   } finally {
+  //     client.release();
+  //   }
+  // }
+ public async getGroundV1(userData: any, tokendata: any): Promise<any> {
     // const token = { id: tokendata.id };
     const token = { id: tokendata.id, roleId: tokendata.roleId };
     console.log("token", token);
@@ -973,13 +1052,16 @@ export class groundRepository {
       const result: any = await client.query(getGroundQuery, [refGroundId]);
       const getAddons = await executeQuery(getAvailableAddonsQuery, [
         refGroundId,
-        tokendata.id,
       ]);
       const addons = await executeQuery(listaddonsQuery, [
         refGroundId,
-        tokendata.id,
+      
       ]);
+
       const imgResult = await executeQuery(imgResultQuery, [refGroundId]);
+      console.log('imgResult', imgResult)
+    
+      
 
       for (const product of imgResult) {
         if (product.refGroundImage) {
@@ -1002,6 +1084,7 @@ export class groundRepository {
 
       await client.query("COMMIT"); // Commit transaction
 
+      console.log('imgResult', imgResult)
       return encrypt(
         {
           success: true,
@@ -1273,6 +1356,7 @@ export class groundRepository {
       await client.query("BEGIN"); // Start transaction
 
       const { unAvailabilityDate, refAddOnsId, refGroundId } = userData;
+    
       const result = await client.query(addAddOnsAvailabilityQuery, [
         unAvailabilityDate,
         refAddOnsId,
@@ -1280,16 +1364,6 @@ export class groundRepository {
         CurrentTime(),
         tokendata.id,
       ]);
-
-      // const history = [
-      //   33,
-      //   tokendata.id,
-      //   `${addOns} addOn Added Successfully`,
-      //   CurrentTime(),
-      //   tokendata.id,
-      // ];
-
-      // const updateHistory = await client.query(updateHistoryQuery, history);
 
       await client.query("COMMIT"); // Commit transaction
 

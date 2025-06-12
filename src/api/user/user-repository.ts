@@ -24,6 +24,7 @@ import {
   getGroundPriceQuery,
   getGroundsQuery,
   getGroundUnavailableDateQuery,
+  getOwnersQuery,
   getUsersQuery,
   insertUnavailableQuery,
   listaddonsQuery,
@@ -225,7 +226,10 @@ export class userRepository {
         user.refUserId,
       ];
       await client.query(updateHistoryQuery, history);
-      console.log('generateTokenWithExpire(tokenData, true) line ------ 228', generateTokenWithExpire(tokenData, true))
+      console.log(
+        "generateTokenWithExpire(tokenData, true) line ------ 228",
+        generateTokenWithExpire(tokenData, true)
+      );
 
       return encrypt(
         {
@@ -864,7 +868,7 @@ export class userRepository {
     // const token = { id: token_data.id }; // Extract token ID
     // const tokens = generateTokenWithExpire(token, true);
     try {
-      const { emailId } = userData;
+      const { emailId, roleID } = userData;
 
       // Validate input
       if (!emailId) {
@@ -879,21 +883,36 @@ export class userRepository {
 
       // Begin database transaction
       await client.query("BEGIN");
+      let result;
 
-      // Fetch all mobile numbers associated with the user
-      const Result = await executeQuery(getUsersQuery, [emailId]);
+      if (roleID == 2) {
+        result = await executeQuery(getUsersQuery, [emailId]);
+      } else {
+        result = await executeQuery(getOwnersQuery, [emailId]);
+      }
+      console.log('result', result)
 
-      // Check if any mobile numbers were found
-      if (!Result.length) {
+      if (!result.length) {
         return encrypt(
           {
             success: false,
-            message: "No found for the user",
-            // token: tokens,
+            message: "No record found for the user",
           },
           true
         );
       }
+
+      // Check if any mobile numbers were found
+      // if (!Result.length) {
+      //   return encrypt(
+      //     {
+      //       success: false,
+      //       message: "No found for the user",
+      //       // token: tokens,
+      //     },
+      //     true
+      //   );
+      // }
       const genPassword = generatePassword();
       console.log("genPassword", genPassword);
       const genHashedPassword = await bcrypt.hash(genPassword, 10);
@@ -957,6 +976,7 @@ export class userRepository {
           success: true,
           message: "mail send successfully",
           emailId: emailId,
+          updatePassword:updatePassword
           // token: tokens,
         },
         true
@@ -2036,5 +2056,4 @@ export class userRepository {
       );
     }
   }
-
 }
