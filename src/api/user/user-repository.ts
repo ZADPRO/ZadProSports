@@ -1254,7 +1254,10 @@ export class userRepository {
       const result = await executeQuery(getGroundsQuery, [
         userData.refGroundId,
       ]);
-
+     const addons = await executeQuery(listaddonsQuery, [
+        userData.refGroundId,
+      
+      ]);
       const groundUnavailableDate = await executeQuery(
         getGroundUnavailableDateQuery,
         [userData.refGroundId]
@@ -1284,6 +1287,7 @@ export class userRepository {
           token: tokens,
           groundResult: result, // Return deleted record for reference
           groundUnavailableDate: groundUnavailableDate,
+          addons:addons
         },
         true
       );

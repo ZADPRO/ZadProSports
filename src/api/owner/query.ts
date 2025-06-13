@@ -2,9 +2,9 @@ export const checkQuery = `
 SELECT
   COUNT(*)
 FROM
-  public."refUsersDomain"
+  public."owners"
 WHERE
-  "refEmail" = $1
+  "refEmailId" = $1
 `;
 
 export const getLastPartnerIdQuery = `

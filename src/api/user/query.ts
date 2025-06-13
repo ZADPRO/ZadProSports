@@ -511,49 +511,139 @@ WHERE
 export const getGroundsQuery = `
 SELECT
   rg.*,
-  array_agg(DISTINCT f."refFeaturesName") AS "refFeaturesName",
-  array_agg(DISTINCT fe."refFacilitiesName") AS "refFacilitiesName",
-  array_agg(DISTINCT ug."refUserGuidelinesName") AS "refUserGuidelinesName",
-  array_agg(DISTINCT ad."refAdditionalTipsName") AS "refAdditionalTipsName",
-  array_agg(DISTINCT s."refSportsCategoryName") AS "refSportsCategoryName"
-FROM
-  public."refGround" rg
-  LEFT JOIN public."refFeatures" f ON CAST(f."refFeaturesId" AS INTEGER) = ANY (
-    string_to_array(
-      regexp_replace(rg."refFeaturesId", '[{}]', '', 'g'),
-      ','
-    )::INTEGER[]
-  )
-  LEFT JOIN public."refFacilities" fe ON CAST(fe."refFacilitiesId" AS INTEGER) = ANY (
-    string_to_array(
-      regexp_replace(rg."refFacilitiesId", '[{}]', '', 'g'),
-      ','
-    )::INTEGER[]
-  )
-  LEFT JOIN public."refUserGuidelines" ug ON CAST(ug."refUserGuidelinesId" AS INTEGER) = ANY (
-    string_to_array(
-      regexp_replace(rg."refUserGuidelinesId", '[{}]', '', 'g'),
-      ','
-    )::INTEGER[]
-  )
-  LEFT JOIN public."refAdditionalTips" ad ON CAST(ad."refAdditionalTipsId" AS INTEGER) = ANY (
-    string_to_array(
-      regexp_replace(rg."refAdditionalTipsId", '[{}]', '', 'g'),
-      ','
-    )::INTEGER[]
-  )
-  LEFT JOIN public."refSportsCategory" s ON CAST(s."refSportsCategoryId" AS INTEGER) = ANY (
-    string_to_array(
-      regexp_replace(rg."refSportsCategoryId", '[{}]', '', 'g'),
-      ','
-    )::INTEGER[]
-  )
-WHERE
-  rg."isDelete" IS NOT true
-  AND rg."refGroundId" = $1
-GROUP BY
-  rg."refGroundId";
+
+  string_to_array(regexp_replace(rg."refFeaturesId", '[{}]', '', 'g'), ',')::int[] AS "refFeaturesId",
+  string_to_array(regexp_replace(rg."refUserGuidelinesId", '[{}]', '', 'g'), ',')::int[] AS "refUserGuidelinesId",
+  string_to_array(regexp_replace(rg."refFacilitiesId", '[{}]', '', 'g'), ',')::int[] AS "refFacilitiesId",
+  string_to_array(regexp_replace(rg."refAdditionalTipsId", '[{}]', '', 'g'), ',')::int[] AS "refAdditionalTipsId",
+  string_to_array(regexp_replace(rg."refSportsCategoryId", '[{}]', '', 'g'), ',')::int[] AS "refSportsCategoryId",
+
+  (
+    SELECT json_agg(DISTINCT f."refFeaturesName")
+    FROM public."refFeatures" f
+    WHERE CAST(f."refFeaturesId" AS INTEGER) = ANY (
+      string_to_array(regexp_replace(rg."refFeaturesId", '[{}]', '', 'g'), ',')::int[]
+    )
+  ) AS "refFeaturesName",
+
+  (
+    SELECT json_agg(DISTINCT fe."refFacilitiesName")
+    FROM public."refFacilities" fe
+    WHERE CAST(fe."refFacilitiesId" AS INTEGER) = ANY (
+      string_to_array(regexp_replace(rg."refFacilitiesId", '[{}]', '', 'g'), ',')::int[]
+    )
+  ) AS "refFacilitiesName",
+
+  (
+    SELECT json_agg(DISTINCT ug."refUserGuidelinesName")
+    FROM public."refUserGuidelines" ug
+    WHERE CAST(ug."refUserGuidelinesId" AS INTEGER) = ANY (
+      string_to_array(regexp_replace(rg."refUserGuidelinesId", '[{}]', '', 'g'), ',')::int[]
+    )
+  ) AS "refUserGuidelinesName",
+
+  (
+    SELECT json_agg(DISTINCT ad."refAdditionalTipsName")
+    FROM public."refAdditionalTips" ad
+    WHERE CAST(ad."refAdditionalTipsId" AS INTEGER) = ANY (
+      string_to_array(regexp_replace(rg."refAdditionalTipsId", '[{}]', '', 'g'), ',')::int[]
+    )
+  ) AS "refAdditionalTipsName",
+
+  (
+    SELECT json_agg(DISTINCT s."refSportsCategoryName")
+    FROM public."refSportsCategory" s
+    WHERE CAST(s."refSportsCategoryId" AS INTEGER) = ANY (
+      string_to_array(regexp_replace(rg."refSportsCategoryId", '[{}]', '', 'g'), ',')::int[]
+    )
+  ) AS "refSportsCategoryName",
+
+  (
+    SELECT json_agg(
+      DISTINCT jsonb_build_object(
+        'id', ao."refAddOnsId",
+        'addOn', ao."refAddOn",
+        'price', ao."refAddonPrice",
+        'unAvailabilityDate', aa."unAvailabilityDate",
+        'subAddOns', (
+          SELECT json_agg(
+            DISTINCT jsonb_build_object(
+              'id', sa."subAddOnsId",
+              'subAddOn', sa."refSubAddOnName",
+              'price', sa."refSubAddOnPrice",
+              'items', (
+                SELECT json_agg(
+                  DISTINCT jsonb_build_object(
+                    'id', it."refItemsId",
+                    'item', it."refItemsName",
+                    'price', it."refItemsPrice"
+                  )
+                )
+                FROM public."refItems" it
+                WHERE it."subAddOnsId" = sa."subAddOnsId"
+              )
+            )
+          )
+          FROM public."subAddOns" sa
+          WHERE sa."refAddOnsId" = ao."refAddOnsId"
+        )
+      )
+    )
+    FROM public."refAddOns" ao
+    LEFT JOIN public."addOnUnAvailability" aa ON aa."refAddOnsId" = ao."refAddOnsId"
+    WHERE ao."refGroundId" = rg."refGroundId"
+      AND ao."isDelete" IS NOT true
+  ) AS "addOns"
+
+FROM public."refGround" rg
+WHERE rg."refGroundId" = $1;
 `;
+// export const getGroundsQuery = `
+// SELECT
+//   rg.*,
+//   array_agg(DISTINCT f."refFeaturesName") AS "refFeaturesName",
+//   array_agg(DISTINCT fe."refFacilitiesName") AS "refFacilitiesName",
+//   array_agg(DISTINCT ug."refUserGuidelinesName") AS "refUserGuidelinesName",
+//   array_agg(DISTINCT ad."refAdditionalTipsName") AS "refAdditionalTipsName",
+//   array_agg(DISTINCT s."refSportsCategoryName") AS "refSportsCategoryName"
+// FROM
+//   public."refGround" rg
+//   LEFT JOIN public."refFeatures" f ON CAST(f."refFeaturesId" AS INTEGER) = ANY (
+//     string_to_array(
+//       regexp_replace(rg."refFeaturesId", '[{}]', '', 'g'),
+//       ','
+//     )::INTEGER[]
+//   )
+//   LEFT JOIN public."refFacilities" fe ON CAST(fe."refFacilitiesId" AS INTEGER) = ANY (
+//     string_to_array(
+//       regexp_replace(rg."refFacilitiesId", '[{}]', '', 'g'),
+//       ','
+//     )::INTEGER[]
+//   )
+//   LEFT JOIN public."refUserGuidelines" ug ON CAST(ug."refUserGuidelinesId" AS INTEGER) = ANY (
+//     string_to_array(
+//       regexp_replace(rg."refUserGuidelinesId", '[{}]', '', 'g'),
+//       ','
+//     )::INTEGER[]
+//   )
+//   LEFT JOIN public."refAdditionalTips" ad ON CAST(ad."refAdditionalTipsId" AS INTEGER) = ANY (
+//     string_to_array(
+//       regexp_replace(rg."refAdditionalTipsId", '[{}]', '', 'g'),
+//       ','
+//     )::INTEGER[]
+//   )
+//   LEFT JOIN public."refSportsCategory" s ON CAST(s."refSportsCategoryId" AS INTEGER) = ANY (
+//     string_to_array(
+//       regexp_replace(rg."refSportsCategoryId", '[{}]', '', 'g'),
+//       ','
+//     )::INTEGER[]
+//   )
+// WHERE
+//   rg."isDelete" IS NOT true
+//   AND rg."refGroundId" = $1
+// GROUP BY
+//   rg."refGroundId";
+// `;
 
 export const getGroundUnavailableDateQuery = `
 SELECT

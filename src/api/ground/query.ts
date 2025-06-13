@@ -235,6 +235,7 @@ GROUP BY
   `;
 export const listAllGroundQuery = `
 SELECT
+  o."refOwnerFname",
   rg.*,
   array_agg(DISTINCT ao."refAddOnsId") AS "AddOn",
   array_agg(DISTINCT f."refFeaturesId") AS "refFeaturesIds",
@@ -280,10 +281,12 @@ FROM
       ','
     )::INTEGER[]
   )
+  LEFT JOIN public."owners" o ON CAST(o."refOwnerId" AS INTEGER) = rg."createdBy"::integer
 WHERE
   rg."isDelete" IS NOT true
 GROUP BY
-  rg."refGroundId";
+  rg."refGroundId",
+  o."refOwnerFname";
 
   `;
 
@@ -323,6 +326,7 @@ GROUP BY
 //   ao."refAddOn",
 //   aa."unAvailabilityDate";
 //   `;
+
 
 export const deleteGroundQuery = `
 UPDATE
@@ -428,19 +432,16 @@ RETURNING
  
 // `;
 
-
 export const getGroundQuery = `
 SELECT
   rg.*,
 
-  -- Convert string arrays to int arrays
   string_to_array(regexp_replace(rg."refFeaturesId", '[{}]', '', 'g'), ',')::int[] AS "refFeaturesId",
   string_to_array(regexp_replace(rg."refUserGuidelinesId", '[{}]', '', 'g'), ',')::int[] AS "refUserGuidelinesId",
   string_to_array(regexp_replace(rg."refFacilitiesId", '[{}]', '', 'g'), ',')::int[] AS "refFacilitiesId",
   string_to_array(regexp_replace(rg."refAdditionalTipsId", '[{}]', '', 'g'), ',')::int[] AS "refAdditionalTipsId",
   string_to_array(regexp_replace(rg."refSportsCategoryId", '[{}]', '', 'g'), ',')::int[] AS "refSportsCategoryId",
 
-  -- Related names
   (
     SELECT json_agg(DISTINCT f."refFeaturesName")
     FROM public."refFeatures" f

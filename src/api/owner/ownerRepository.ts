@@ -553,32 +553,32 @@ export class ownerRepository {
             product.refGroundImage = null; // Handle missing or unreadable files gracefully
           }
         }
-        if (product.refDocument1Path) {
-          try {
-            const fileBuffer = await viewFile(product.refDocument1Path);
-            product.refDocument1Path = {
-              filename: path.basename(product.refDocument1Path),
-              content: fileBuffer.toString("base64"),
-              contentType: "application/pdf", // Change based on actual file type if necessary
-            };
-          } catch (err) {
-            console.error("Error reading image file for product ", err);
-            product.refDocument1Path = null; // Handle missing or unreadable files gracefully
-          }
-        }
-        if (product.refDocument2Path) {
-          try {
-            const fileBuffer = await viewFile(product.refDocument2Path);
-            product.refDocument2Path = {
-              filename: path.basename(product.refDocument2Path),
-              content: fileBuffer.toString("base64"),
-              contentType: "application/pdf", // Change based on actual file type if necessary
-            };
-          } catch (err) {
-            console.error("Error reading image file for product ", err);
-            product.refDocument2Path = null; // Handle missing or unreadable files gracefully
-          }
-        }
+        // if (product.refDocument1Path) {
+        //   try {
+        //     const fileBuffer = await viewFile(product.refDocument1Path);
+        //     product.refDocument1Path = {
+        //       filename: path.basename(product.refDocument1Path),
+        //       content: fileBuffer.toString("base64"),
+        //       contentType: "application/pdf", // Change based on actual file type if necessary
+        //     };
+        //   } catch (err) {
+        //     console.error("Error reading image file for product ", err);
+        //     product.refDocument1Path = null; // Handle missing or unreadable files gracefully
+        //   }
+        // }
+        // if (product.refDocument2Path) {
+        //   try {
+        //     const fileBuffer = await viewFile(product.refDocument2Path);
+        //     product.refDocument2Path = {
+        //       filename: path.basename(product.refDocument2Path),
+        //       content: fileBuffer.toString("base64"),
+        //       contentType: "application/pdf", // Change based on actual file type if necessary
+        //     };
+        //   } catch (err) {
+        //     console.error("Error reading image file for product ", err);
+        //     product.refDocument2Path = null; // Handle missing or unreadable files gracefully
+        //   }
+        // }
       }
 
       return encrypt(
@@ -662,9 +662,9 @@ export class ownerRepository {
           success: true,
           message: "owner listed successfully",
           token: tokens,
-          result: result, // Return deleted record for reference
+          documentresult: result, // Return deleted record for reference
         },
-        false
+        true
       );
     } catch (error: unknown) {
       console.error("Error list owner", error);
