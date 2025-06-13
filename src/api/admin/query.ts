@@ -359,10 +359,10 @@ SELECT
     SELECT
       COUNT(*)
     FROM
-      public."users" u
+      public."owners" o
     WHERE
-      u."isDelete" IS NOT true
-      AND u."refCustId" LIKE 'CGA-OWN-%'
+      o."isDelete" IS NOT true
+      AND o."refOwnerCustId" LIKE 'CGA-OWN-%'
   ) AS "OwnerCount",
 (SELECT
   SUM("totalEarnings"::numeric)
@@ -409,12 +409,9 @@ FROM
   LEFT JOIN public."refTransactionType" tt ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
   LEFT JOIN public."users" u ON CAST(u."refuserId" AS INTEGER) = tx."updatedBy"::int
 WHERE
-  tx."refTransactionTypeId" = '39'
-  AND tx."refTransactionTypeId" = '36'
-  AND tx."refTransactionTypeId" = '37'
-  AND tx."refTransactionTypeId" = '38'
+  tx."refTransactionTypeId" IN ('39', '36', '37', '38')
   AND tx."isDelete" IS NOT true
-  ORDER BY
+ORDER BY
   tx."refTxnHistoryId" DESC;
 `
 ;
@@ -428,16 +425,9 @@ FROM
   LEFT JOIN public."refTransactionType" tt ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
   LEFT JOIN public."owners" o ON CAST(o."refOwnerId" AS INTEGER) = tx."updatedBy"::int
 WHERE
-  tx."refTransactionTypeId" = '40'
-  AND tx."refTransactionTypeId" = '24'
-  AND tx."refTransactionTypeId" = '25'
-  AND tx."refTransactionTypeId" = '26'
-  AND tx."refTransactionTypeId" = '33'
-  AND tx."refTransactionTypeId" = '34'
-  AND tx."refTransactionTypeId" = '35'
-    AND tx."isDelete" IS NOT true
-
-  ORDER BY
+  tx."refTransactionTypeId" IN ('40', '24', '25', '26', '33', '34', '35', '6', '7', '8', '9', '10', '11', '12', '13', '14')
+  AND tx."isDelete" IS NOT true
+ORDER BY
   tx."refTxnHistoryId" DESC;
 `
 ;
