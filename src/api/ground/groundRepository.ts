@@ -878,92 +878,170 @@ export class groundRepository {
     }
   }
 
+  // public async deleteGroundV1(userData: any, tokendata: any): Promise<any> {
+  //   // const token = { id: tokendata.id };
+  //   const token = { id: tokendata.id, roleId: tokendata.roleId };
+  //   console.log("token", token);
+
+  //   const tokens = generateTokenWithExpire(token, true);
+  //   const client: PoolClient = await getClient();
+
+  //   try {
+  //     await client.query("BEGIN"); // Start transaction
+
+  //     const { refGroundId } = userData;
+  //     const result = await client.query(deleteGroundQuery, [
+  //       refGroundId,
+  //       CurrentTime(),
+  //       tokendata.id,
+  //     ]);
+
+  //     if (result.rowCount === 0) {
+  //       await client.query("ROLLBACK");
+  //       return encrypt(
+  //         {
+  //           success: false,
+  //           message: "ground not found or already deleted",
+  //           token: tokens,
+  //         },
+  //         true
+  //       );
+  //     }
+
+  //     const imageRecords = await executeQuery(getImageRecordQuery, [
+  //       refGroundId,
+  //     ]);
+
+  //     if (!imageRecords?.length) {
+  //       return encrypt(
+  //         {
+  //           success: false,
+  //           message: "Image record not found",
+  //           token: tokens,
+  //         },
+  //         true
+  //       );
+  //     }
+
+  //     const filePath = imageRecords[0].refGroundImage;
+  //     await deleteFile(filePath); // Remove image from storage
+
+  //     const history = [
+  //       26, // Unique ID for delete action
+  //       tokendata.id,
+  //       `ground deleted succesfully`,
+  //       CurrentTime(),
+  //       tokendata.id,
+  //     ];
+
+  //     await client.query(updateHistoryQuery, history);
+  //     await client.query("COMMIT"); // Commit transaction
+
+  //     return encrypt(
+  //       {
+  //         success: true,
+  //         message: "ground deleted successfully",
+  //         token: tokens,
+  //         deletedData: result.rows[0], // Return deleted record for reference
+  //       },
+  //       true
+  //     );
+  //   } catch (error: unknown) {
+  //     await client.query("ROLLBACK"); // Rollback on error
+  //     console.error("Error deleting ground:", error);
+
+  //     return encrypt(
+  //       {
+  //         success: false,
+  //         message: "An error occurred while deleting the ground",
+  //         token: tokens,
+  //         error: String(error),
+  //       },
+  //       true
+  //     );
+  //   } finally {
+  //     client.release();
+  //   }
+  // }
   public async deleteGroundV1(userData: any, tokendata: any): Promise<any> {
-    // const token = { id: tokendata.id };
-    const token = { id: tokendata.id, roleId: tokendata.roleId };
-    console.log("token", token);
+  const token = { id: tokendata.id, roleId: tokendata.roleId };
+  const tokens = generateTokenWithExpire(token, true);
+  const client: PoolClient = await getClient();
 
-    const tokens = generateTokenWithExpire(token, true);
-    const client: PoolClient = await getClient();
+  try {
+    await client.query("BEGIN");
 
-    try {
-      await client.query("BEGIN"); // Start transaction
+    const { refGroundId } = userData;
+    const result = await client.query(deleteGroundQuery, [
+      refGroundId,
+      CurrentTime(),
+      tokendata.id,
+    ]);
 
-      const { refGroundId } = userData;
-      const result = await client.query(deleteGroundQuery, [
-        refGroundId,
-        CurrentTime(),
-        tokendata.id,
-      ]);
-
-      if (result.rowCount === 0) {
-        await client.query("ROLLBACK");
-        return encrypt(
-          {
-            success: false,
-            message: "ground not found or already deleted",
-            token: tokens,
-          },
-          true
-        );
-      }
-
-      const imageRecords = await executeQuery(getImageRecordQuery, [
-        refGroundId,
-      ]);
-
-      if (!imageRecords?.length) {
-        await client.query("ROLLBACK");
-        return encrypt(
-          {
-            success: false,
-            message: "Image record not found",
-            token: tokens,
-          },
-          true
-        );
-      }
-
-      const filePath = imageRecords[0].refGroundImage;
-      await deleteFile(filePath); // Remove image from storage
-
-      const history = [
-        26, // Unique ID for delete action
-        tokendata.id,
-        `ground deleted succesfully`,
-        CurrentTime(),
-        tokendata.id,
-      ];
-
-      await client.query(updateHistoryQuery, history);
-      await client.query("COMMIT"); // Commit transaction
-
-      return encrypt(
-        {
-          success: true,
-          message: "ground deleted successfully",
-          token: tokens,
-          deletedData: result.rows[0], // Return deleted record for reference
-        },
-        true
-      );
-    } catch (error: unknown) {
-      await client.query("ROLLBACK"); // Rollback on error
-      console.error("Error deleting ground:", error);
-
+    if (result.rowCount === 0) {
+      await client.query("ROLLBACK");
       return encrypt(
         {
           success: false,
-          message: "An error occurred while deleting the ground",
+          message: "Ground not found or already deleted",
           token: tokens,
-          error: String(error),
         },
         true
       );
-    } finally {
-      client.release();
     }
+
+    // Try to get image record, but don't treat missing record as a fatal error
+    const imageRecords = await executeQuery(getImageRecordQuery, [refGroundId]);
+    if (imageRecords?.length) {
+      const filePath = imageRecords[0].refGroundImage;
+      try {
+        await deleteFile(filePath); // Remove image from storage
+      } catch (err) {
+        console.error("Failed to delete file:", err);
+        // Optionally log the failure but continue
+      }
+    } else {
+      console.warn("Image record not found, skipping file deletion.");
+    }
+
+    // History log
+    const history = [
+      26, // Action ID for delete
+      tokendata.id,
+      "Ground deleted successfully",
+      CurrentTime(),
+      tokendata.id,
+    ];
+    await client.query(updateHistoryQuery, history);
+
+    await client.query("COMMIT");
+
+    return encrypt(
+      {
+        success: true,
+        message: "Ground deleted successfully",
+        token: tokens,
+        deletedData: result.rows[0],
+      },
+      true
+    );
+  } catch (error: unknown) {
+    await client.query("ROLLBACK");
+    console.error("Error deleting ground:", error);
+    return encrypt(
+      {
+        success: false,
+        message: "An error occurred while deleting the ground",
+        token: tokens,
+        error: String(error),
+      },
+      true
+    );
+  } finally {
+    client.release();
   }
+}
+
   // public async getGroundV1(userData: any, tokendata: any): Promise<any> {
   //   // const token = { id: tokendata.id };
   //   const token = { id: tokendata.id, roleId: tokendata.roleId };
