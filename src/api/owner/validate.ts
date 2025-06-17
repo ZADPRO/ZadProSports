@@ -113,7 +113,7 @@ export default {
   },
   deleteOwners: {
     payload: Joi.object({
-      refUserId: Joi.number().integer().required(),
+      refOwnerId: Joi.number().integer().required(),
     }),
     headers: Joi.object({
       authorization: Joi.string().optional(),
