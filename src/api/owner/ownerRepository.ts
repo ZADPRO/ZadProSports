@@ -26,6 +26,7 @@ import {
   insertUserQuery,
   listOwnersQuery,
   listSportCategoryQuery,
+  OwnersBookingsQuery,
   OwnersHistoryQuery,
   updateduserTypeQuery,
   updateHistoryQuery,
@@ -130,7 +131,7 @@ export class ownerRepository {
         refDocument2Path,
         isDefaultAddress,
         3,
-        `Draft`,
+        `DRAFT`,
         CurrentTime(),
         3,
       ];
@@ -238,7 +239,6 @@ export class ownerRepository {
       client.release();
     }
   }
-
   public async uploadGroundImageV1(
     userData: any,
     tokendata: any
@@ -306,6 +306,7 @@ export class ownerRepository {
     try {
       // Extract the PDF file from userData
       const pdfFile = userData["PdfFile "] || userData.PdfFile;
+      console.log('userData', userData)
 
       // Ensure that a PDF file is provided
       if (!pdfFile) {
@@ -826,7 +827,7 @@ export class ownerRepository {
         const historyParams = [
           37,
           token_data.id,
-          `${refOwnerFname} Owner updated successfully`,
+          `${refOwnerFname} Owner updated their Profile successfully`,
           CurrentTime(),
           token_data.id,
         ];
@@ -966,7 +967,7 @@ export class ownerRepository {
         throw new Error("Owner not found");
       }
 
-      const { refUserFname, refEmailId } = getUserDetails[0];
+      const { refOwnerFname, refEmailId } = getUserDetails[0];
 
       // 2. Update status in database
       const updatedStatus = await client.query(updateOwnerStatusQuery, [
@@ -986,7 +987,7 @@ export class ownerRepository {
 
       // 3. Generate email content
       const { subject, body } = getOwnerStatusEmailContent(
-        refUserFname,
+        refOwnerFname,
         newStatus,
         content
       );
@@ -1001,7 +1002,7 @@ export class ownerRepository {
       const history = [
         24,
         tokendata.id,
-        `${refUserFname}'s status changed to ${OwnerStatusLabels[newStatus]} successfully`,
+        `${refOwnerFname}'s status changed to ${OwnerStatusLabels[newStatus]} successfully`,
         CurrentTime(),
         tokendata.id,
       ];
@@ -1021,7 +1022,7 @@ export class ownerRepository {
       );
     } catch (error: unknown) {
       await client.query("ROLLBACK");
-      console.error("Error in ownerStatusV1:", error);
+      console.error("Error in ownerStatus:", error);
 
       return encrypt(
         {
@@ -1036,7 +1037,6 @@ export class ownerRepository {
       client.release();
     }
   }
-
   public async ownerHistoryWithStatusV1(
     userData: any,
     tokendata: any
@@ -1138,6 +1138,42 @@ export class ownerRepository {
           success: false,
           message: "An error occurred while listing the Sports Category Name",
           // token: tokens,
+          error: String(error),
+        },
+        true
+      );
+    }
+  }
+  public async financeV1(
+    userData: any,
+    tokendata: any
+  ): Promise<any> {
+    const token = { id: tokendata.id, roleId: tokendata.roleId };
+    console.log("token", token);
+    const tokens = generateTokenWithExpire(token, true);
+
+    try {
+      const bookingresult = await executeQuery(OwnersBookingsQuery, [tokendata.id]);
+      const payoutresult = await executeQuery(OwnersBookingsQuery, [tokendata.id]);
+
+      return encrypt(
+        {
+          success: true,
+          message: "owner listed successfully",
+          token: tokens,
+          bookingresult: bookingresult, // Return deleted record for reference
+          payoutresult: payoutresult, // Return deleted record for reference
+        },
+        true
+      );
+    } catch (error: unknown) {
+      console.error("Error list owner", error);
+
+      return encrypt(
+        {
+          success: false,
+          message: "An error occurred while list owner",
+          token: tokens,
           error: String(error),
         },
         true

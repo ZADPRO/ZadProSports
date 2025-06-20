@@ -178,6 +178,17 @@ export class ownerRoutes implements IRoute {
             auth: false,
           },
         },
+        {
+          method: "GET",
+          path: "/api/v1/ownerRoutes/finance",
+          config: {
+            pre: [{ method: validateToken, assign: "token" }],
+            handler: controller.finance,
+            description: "finance",
+            tags: ["api", "Users"],
+            auth: false,
+          },
+        },
       ]);
       resolve(true);
     });

@@ -44,5 +44,8 @@ export class ownerResolver {
   public async listSportsCategoryV1(user_data: any, token_data:any, domain_code: any): Promise<any> {
     return await this.ownerRepository.listSportsCategoryV1(user_data,token_data, domain_code);
   }
+  public async financeV1(user_data: any, token_data:any, domain_code: any): Promise<any> {
+    return await this.ownerRepository.financeV1(user_data,token_data, domain_code);
+  }
 
 }

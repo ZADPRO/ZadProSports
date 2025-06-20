@@ -43,7 +43,7 @@ export class financeController {
         .code(500);
     }
   };
-  public recordBookingFinance = async (
+  public findAmounts = async (
     request: any,
     response: Hapi.ResponseToolkit
   ): Promise<any> => {
@@ -54,14 +54,14 @@ export class financeController {
         roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
-      entity = await this.resolver.recordBookingFinanceV1(request.payload, decodedToken);
+      entity = await this.resolver.findAmountsV1(request.payload, decodedToken);
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
     } catch (error) {
-      logger.error("Error in recordBookingFinance", error);
+      logger.error("Error in findAmounts", error);
       return response
         .response({
           success: false,
@@ -73,7 +73,7 @@ export class financeController {
         .code(500);
     }
   };
-  public getWeeklyPayouts = async (
+  public markAsPaid = async (
     request: any,
     response: Hapi.ResponseToolkit
   ): Promise<any> => {
@@ -84,14 +84,14 @@ export class financeController {
         roleId: request.plugins.token.roleId, // Add this
       };
       let entity;
-      entity = await this.resolver.getWeeklyPayoutsV1(request.payload, decodedToken);
+      entity = await this.resolver.markAsPaidV1(request.payload, decodedToken);
 
       if (entity.success) {
         return response.response(entity).code(201); // Created
       }
       return response.response(entity).code(200); // Bad Request if failed
     } catch (error) {
-      logger.error("Error in getWeeklyPayouts", error);
+      logger.error("Error in markAsPaid", error);
       return response
         .response({
           success: false,
@@ -152,6 +152,36 @@ export class financeController {
       return response.response(entity).code(200); // Bad Request if failed
     } catch (error) {
       logger.error("Error in deletePayouts", error);
+      return response
+        .response({
+          success: false,
+          message:
+            error instanceof Error
+              ? error.message
+              : "An unknown error occurred",
+        })
+        .code(500);
+    }
+  };
+  public listOwners = async (
+    request: any,
+    response: Hapi.ResponseToolkit
+  ): Promise<any> => {
+    logger.info(`GET URL REQ => ${request.url.href}`);
+    try {
+      const decodedToken = {
+        id: request.plugins.token.id,
+        roleId: request.plugins.token.roleId, // Add this
+      };
+      let entity;
+      entity = await this.resolver.listOwnersV1(request.payload, decodedToken);
+
+      if (entity.success) {
+        return response.response(entity).code(201); // Created
+      }
+      return response.response(entity).code(200); // Bad Request if failed
+    } catch (error) {
+      logger.error("Error in listOwners", error);
       return response
         .response({
           success: false,

@@ -369,3 +369,9 @@ FROM
   WHERE
   "isDelete" IS NOT true
 `;
+
+
+
+export const OwnersBookingsQuery = `
+
+`

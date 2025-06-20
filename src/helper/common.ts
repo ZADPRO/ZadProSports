@@ -14,9 +14,29 @@
 // };
 
 export const CurrentTime = (): string => {
-  const today = new Date();
-  return today.toISOString().replace("T", " ").slice(0, 19); // "YYYY-MM-DD HH:mm:ss"
+  const now = new Date();
+
+  // Get IST offset (in minutes)
+  const istOffset = 330; // IST is UTC+5:30 => 5*60 + 30 = 330
+
+  // Convert current time to IST
+  const istTime = new Date(now.getTime() + istOffset * 60000 - now.getTimezoneOffset() * 60000);
+
+  // Format to YYYY-MM-DD HH:mm:ss
+  const year = istTime.getFullYear();
+  const month = String(istTime.getMonth() + 1).padStart(2, '0');
+  const day = String(istTime.getDate()).padStart(2, '0');
+  const hours = String(istTime.getHours()).padStart(2, '0');
+  const minutes = String(istTime.getMinutes()).padStart(2, '0');
+  const seconds = String(istTime.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
+
+// export const CurrentTime = (): string => {
+//   const today = new Date();
+//   return today.toISOString().replace("T", " ").slice(0, 19); // "YYYY-MM-DD HH:mm:ss"
+// };
 
 export function generateFileName(): string {
   // Generate a random string of 6 alphabets

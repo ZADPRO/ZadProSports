@@ -403,11 +403,17 @@ WHERE
 export const ownerStatusAuditQuery = `
 SELECT
   tt."refTransactionType",
-  tx.*
+  tx.*,
+  CASE
+    WHEN tx."updatedBy" = '1' THEN 'admin'
+    ELSE o."refOwnerFname"
+  END AS "refOwnerFname"
 FROM
   public."refTxnHistory" tx
-  LEFT JOIN public."refTransactionType" tt ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
-  LEFT JOIN public."users" u ON CAST(u."refuserId" AS INTEGER) = tx."updatedBy"::int
+  LEFT JOIN public."refTransactionType" tt 
+    ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
+  LEFT JOIN public."owners" o 
+    ON CAST(o."refOwnerId" AS INTEGER) = tx."updatedBy"::int
 WHERE
   tx."refTransactionTypeId" IN ('39', '36', '37', '38')
   AND tx."isDelete" IS NOT true
@@ -419,13 +425,20 @@ export const groundAuditQuery = `
 SELECT
   tt."refTransactionType",
   tx.*,
-  o."refOwnerFname"
+  CASE
+    WHEN tx."updatedBy" = '1' THEN 'Admin'
+    ELSE o."refOwnerFname"
+  END AS "refOwnerFname"
 FROM
   public."refTxnHistory" tx
-  LEFT JOIN public."refTransactionType" tt ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
-  LEFT JOIN public."owners" o ON CAST(o."refOwnerId" AS INTEGER) = tx."updatedBy"::int
+  LEFT JOIN public."refTransactionType" tt 
+    ON CAST(tt."refTransactionTypeId" AS INTEGER) = tx."refTransactionTypeId"
+  LEFT JOIN public."owners" o 
+    ON CAST(o."refOwnerId" AS INTEGER) = tx."updatedBy"::int
 WHERE
-  tx."refTransactionTypeId" IN ('40', '24', '25', '26', '33', '34', '35', '6', '7', '8', '9', '10', '11', '12', '13', '14')
+  tx."refTransactionTypeId" IN (
+    '40', '24', '25', '26', '33', '34', '35', '6', '7', '8', '9', '10', '11', '12', '13', '14'
+  )
   AND tx."isDelete" IS NOT true
 ORDER BY
   tx."refTxnHistoryId" DESC;

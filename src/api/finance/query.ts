@@ -101,3 +101,16 @@ RETURNING
   *;
 `;
 
+export const checkdateQuery =`
+SELECT
+  w.*
+FROM
+  public."weeklyPayouts" w
+WHERE
+  w."isDelete" IS NOT true
+  AND w."weekStartDate"::date <= $2::date
+  AND w."weekEndDate"::date >= $1::date
+  AND w."refOwnerId" = $3
+ORDER BY
+  w."payoutId" DESC;
+`;
